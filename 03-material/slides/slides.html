@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Slides: Do Clique à API</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Fira+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --tinta: #111; --cinza: #666; --claro: #d2d2d2; --acento: #b4321f; }
+  @page { size: 338.67mm 190.5mm; margin: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #fff; }
+  body { font-family: "Fira Sans", sans-serif; color: var(--tinta); }
+  code, .mono { font-family: "Fira Mono", monospace; }
+
+  .slide {
+    width: 338.67mm; height: 190.5mm; overflow: hidden; position: relative;
+    padding: 24mm 28mm 20mm; display: flex; flex-direction: column;
+    page-break-after: always; break-after: page;
+  }
+  .slide:last-child { page-break-after: auto; break-after: auto; }
+  .rotulo { font-size: 15pt; font-weight: 500; color: var(--acento); }
+  h1 { font-size: 46pt; font-weight: 600; line-height: 1.08; letter-spacing: -.01em; margin-top: 4mm; }
+  h1 .a { color: var(--acento); }
+  .texto { font-size: 22pt; font-weight: 300; line-height: 1.4; margin-top: 9mm; max-width: 230mm; color: #333; }
+  .rodape { position: absolute; left: 28mm; right: 28mm; bottom: 12mm; display: flex; justify-content: space-between; font-size: 10pt; color: var(--cinza); }
+  .meio { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+
+  /* Capa: a faixa da apostila */
+  .capa { padding: 0; }
+  .capa .cor { background: var(--acento); color: #fff; height: 128mm; padding: 22mm 28mm 14mm; display: flex; flex-direction: column; }
+  .capa .cor .sobre { font-size: 14pt; font-weight: 500; }
+  .capa .cor h1 { margin-top: auto; font-size: 60pt; line-height: 1.02; letter-spacing: -.02em; }
+  .capa .pe { padding: 12mm 28mm; display: flex; justify-content: space-between; align-items: end; font-size: 14pt; }
+  .capa .pe p { font-weight: 300; color: #333; max-width: 190mm; font-size: 16pt; line-height: 1.4; }
+  .capa .pe .nomes { text-align: right; font-weight: 500; line-height: 1.5; }
+
+  /* Diagrama da requisição */
+  .diagrama { margin: auto 0; padding-bottom: 8mm; width: 100%; }
+  .diagrama svg { width: 100%; height: auto; display: block; }
+  .diagrama text { font-family: "Fira Sans", sans-serif; }
+  .diagrama .mono { font-family: "Fira Mono", monospace; }
+
+  /* Tabela de métodos e status */
+  table { border-collapse: collapse; margin-top: 10mm; width: 100%; font-size: 19pt; }
+  td { padding: 4.2mm 8mm 4.2mm 0; border-bottom: .5pt solid var(--claro); vertical-align: baseline; }
+  tr:first-child td { border-top: .8pt solid var(--tinta); }
+  tr:last-child td { border-bottom: .8pt solid var(--tinta); }
+  td.m { font-family: "Fira Mono", monospace; font-weight: 500; color: var(--acento); width: 34mm; }
+  td.c { font-family: "Fira Mono", monospace; color: var(--cinza); font-size: 16pt; }
+
+  /* Escala do Nielsen */
+  .escala { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12mm; margin-top: 14mm; }
+  .escala div { border-top: 1.2pt solid var(--tinta); padding-top: 5mm; }
+  .escala b { display: block; font-size: 40pt; font-weight: 600; }
+  .escala .ruim b { color: var(--acento); }
+  .escala .ruim { border-top-color: var(--acento); }
+  .escala p { font-size: 18pt; font-weight: 300; line-height: 1.35; margin-top: 3mm; color: #333; }
+
+  /* Blocos do curso */
+  .blocos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10mm; margin-top: 14mm; }
+  .blocos div { border-top: .8pt solid var(--tinta); padding-top: 4mm; }
+  .blocos span { font-size: 13pt; color: var(--acento); font-weight: 500; }
+  .blocos b { display: block; font-size: 21pt; font-weight: 600; margin-top: 1.5mm; }
+  .blocos p { font-size: 13pt; color: var(--cinza); margin-top: 3mm; line-height: 1.45; }
+
+  /* Links finais */
+  .links { display: grid; grid-template-columns: 62mm 1fr 1fr 1fr; gap: 12mm; align-items: end; margin-top: auto; }
+  .qr svg { width: 100%; height: 100%; display: block; }
+  .links .principal .qr { width: 62mm; height: 62mm; }
+  .links .qr.peq { width: 34mm; height: 34mm; }
+  .links b { display: block; font-size: 15pt; font-weight: 600; margin-top: 4mm; }
+  .links span { display: block; font-family: "Fira Mono", monospace; font-size: 10.5pt; color: var(--cinza); margin-top: 1.5mm; }
+</style>
+</head>
+<body>
+
+<!-- 1. Capa -->
+<section class="slide capa">
+  <div class="cor">
+    <div class="sobre">Minicurso</div>
+    <h1>Do Clique à API:<br>UX de Verdade</h1>
+  </div>
+  <div class="pe">
+    <p>22 problemas de experiência do usuário vistos dos dois lados, cada um na versão ruim e na versão boa, numa lojinha de verdade.</p>
+    <div class="nomes">Adrian Gustavo de Paiva Oliveira<br>Pedro Ferreira</div>
+  </div>
+</section>
+
+<!-- 2. Pergunta -->
+<section class="slide">
+  <div class="meio">
+    <div class="rotulo">Para começar</div>
+    <h1>Qual foi o último app<br>que te irritou? Por quê?</h1>
+  </div>
+</section>
+
+<!-- 3. UX -->
+<section class="slide">
+  <div class="meio">
+    <div class="rotulo">UX</div>
+    <h1>O que a pessoa sente<br>ao usar o sistema.</h1>
+    <p class="texto">Se ela entendeu o que estava acontecendo, quanto esperou, se perdeu o que tinha digitado, se pagou duas vezes sem querer.</p>
+  </div>
+</section>
+
+<!-- 4. API -->
+<section class="slide">
+  <div class="rotulo">API</div>
+  <h1>O programa no servidor que<br>a tela chama para ler e gravar dados.</h1>
+  <div class="diagrama">
+    <svg viewBox="0 0 1000 150">
+      <g font-size="26" text-anchor="middle">
+        <rect x="2" y="30" width="230" height="90" fill="#fff" stroke="#111" stroke-width="2"/>
+        <text x="117" y="84">Navegador</text>
+        <rect x="385" y="30" width="230" height="90" fill="#fff" stroke="#111" stroke-width="2"/>
+        <text x="500" y="84">API</text>
+        <rect x="768" y="30" width="230" height="90" fill="#fff" stroke="#111" stroke-width="2"/>
+        <text x="883" y="84">Banco</text>
+      </g>
+      <g stroke="#111" stroke-width="2" fill="#111">
+        <line x1="240" y1="75" x2="370" y2="75"/><path d="M378 75 l-12 -7 v14 z"/>
+        <line x1="623" y1="75" x2="753" y2="75"/><path d="M761 75 l-12 -7 v14 z"/>
+      </g>
+      <g font-size="17" fill="#666" text-anchor="middle">
+        <text x="117" y="146">o front, a tela</text>
+        <text x="500" y="146">Node.js com Express</text>
+        <text x="883" y="146">Postgres</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- 5 a 7. A requisição, em três passos -->
+<section class="slide">
+  <div class="rotulo">Uma requisição · 1 de 3</div>
+  <h1>A pessoa clica em Livros.<br>O navegador pede à API.</h1>
+  <div class="diagrama">
+    <svg viewBox="0 0 1000 190">
+      <g font-size="26" text-anchor="middle">
+        <rect x="2" y="60" width="230" height="90" fill="#fff" stroke="#111" stroke-width="2"/><text x="117" y="114">Navegador</text>
+        <rect x="385" y="60" width="230" height="90" fill="#fff" stroke="#111" stroke-width="2"/><text x="500" y="114">API</text>
+        <rect x="768" y="60" width="230" height="90" fill="#fff" stroke="#bbb" stroke-width="2"/><text x="883" y="114" fill="#999">Banco</text>
+      </g>
+      <g stroke="#b4321f" stroke-width="3" fill="#b4321f"><line x1="240" y1="105" x2="368" y2="105"/><path d="M378 105 l-13 -8 v16 z"/></g>
+      <text x="309" y="40" font-size="20" text-anchor="middle" class="mono" fill="#b4321f">GET /produtos?categoria=Livros</text>
+    </svg>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="rotulo">Uma requisição · 2 de 3</div>
+  <h1>A API consulta o banco.<br>A tela espera.</h1>
+  <div class="diagrama">
+    <svg viewBox="0 0 1000 190">
+      <g font-size="26" text-anchor="middle">
+        <rect x="2" y="60" width="230" height="90" fill="#fff" stroke="#111" stroke-width="2"/><text x="117" y="114">Navegador</text>
+        <rect x="385" y="60" width="230" height="90" fill="#fff" stroke="#111" stroke-width="2"/><text x="500" y="114">API</text>
+        <rect x="768" y="60" width="230" height="90" fill="#fff" stroke="#111" stroke-width="2"/><text x="883" y="114">Banco</text>
+      </g>
+      <g stroke="#111" stroke-width="2" fill="#111"><line x1="240" y1="105" x2="370" y2="105"/><path d="M378 105 l-12 -7 v14 z"/></g>
+      <g stroke="#b4321f" stroke-width="3" fill="#b4321f"><line x1="623" y1="105" x2="751" y2="105"/><path d="M761 105 l-13 -8 v16 z"/></g>
+      <text x="692" y="40" font-size="20" text-anchor="middle" class="mono" fill="#b4321f">SELECT … FROM produtos</text>
+      <text x="117" y="185" font-size="20" text-anchor="middle" fill="#666">Carregando…</text>
+    </svg>
+  </div>
+</section>
+
+<section class="slide">
+  <div class="rotulo">Uma requisição · 3 de 3</div>
+  <h1>A resposta volta: um status<br>e os dados, em JSON.</h1>
+  <div class="diagrama">
+    <svg viewBox="0 0 1000 190">
+      <g font-size="26" text-anchor="middle">
+        <rect x="2" y="60" width="230" height="90" fill="#fff" stroke="#111" stroke-width="2"/><text x="117" y="114">Navegador</text>
+        <rect x="385" y="60" width="230" height="90" fill="#fff" stroke="#111" stroke-width="2"/><text x="500" y="114">API</text>
+        <rect x="768" y="60" width="230" height="90" fill="#fff" stroke="#bbb" stroke-width="2"/><text x="883" y="114" fill="#999">Banco</text>
+      </g>
+      <g stroke="#b4321f" stroke-width="3" fill="#b4321f"><line x1="250" y1="105" x2="378" y2="105"/><path d="M240 105 l13 -8 v16 z"/></g>
+      <text x="309" y="40" font-size="20" text-anchor="middle" class="mono" fill="#b4321f">200 OK</text>
+      <text x="2" y="185" font-size="20" fill="#666" class="mono">[{ "nome": "Refatoração", … }]</text>
+    </svg>
+  </div>
+</section>
+
+<!-- 8. Métodos -->
+<section class="slide">
+  <div class="rotulo">Métodos</div>
+  <h1>O que a requisição quer fazer.</h1>
+  <table>
+    <tr><td class="m">GET</td><td>buscar</td><td class="c">GET /produtos?categoria=Livros</td></tr>
+    <tr><td class="m">POST</td><td>criar</td><td class="c">POST /transferencias</td></tr>
+    <tr><td class="m">PUT</td><td>gravar por cima</td><td class="c">PUT /favoritos/7</td></tr>
+    <tr><td class="m">DELETE</td><td>apagar</td><td class="c">DELETE /favoritos/7</td></tr>
+  </table>
+</section>
+
+<!-- 9. Status -->
+<section class="slide">
+  <div class="rotulo">Status codes</div>
+  <h1>Como a requisição terminou.</h1>
+  <table>
+    <tr><td class="m">2xx</td><td>deu certo</td><td class="c">200 OK · 201 Created</td></tr>
+    <tr><td class="m">4xx</td><td>o problema está na requisição</td><td class="c">404 · 409 · 422 · 429</td></tr>
+    <tr><td class="m">5xx</td><td>o problema está no servidor</td><td class="c">500 · 503</td></tr>
+  </table>
+</section>
+
+<!-- 10. Nielsen -->
+<section class="slide">
+  <div class="rotulo">Os limites de tempo (Nielsen)</div>
+  <h1>Quanto a pessoa aguenta esperar.</h1>
+  <div class="escala">
+    <div><b>0,1 s</b><p>Parece instantâneo. A pessoa sente que ela mesma fez a coisa acontecer.</p></div>
+    <div><b>1 s</b><p>Ela nota a espera, mas não perde o fio do que estava fazendo.</p></div>
+    <div class="ruim"><b>10 s</b><p>Perde a atenção. Sem sinal de progresso, acha que travou e vai embora.</p></div>
+  </div>
+</section>
+
+<!-- 11. A ideia do curso -->
+<section class="slide">
+  <div class="meio">
+    <h1>UX não é só design.<br><span class="a">Metade dela é decidida na API.</span></h1>
+  </div>
+</section>
+
+<!-- 12. O caminho -->
+<section class="slide">
+  <div class="rotulo">Hoje</div>
+  <h1>A vida de um clique, em 4 blocos.</h1>
+  <div class="blocos">
+    <div><span>Bloco 1</span><b>Antes do clique</b><p>Formulários, erros úteis, URL como estado</p></div>
+    <div><span>Bloco 2</span><b>Durante a espera</b><p>Estados da tela, skeleton, race conditions, optimistic UI, upload</p></div>
+    <div><span>Bloco 3</span><b>Quando dá errado</b><p>Timeouts, retries, clique duplo, rate limiting, sessão, offline</p></div>
+    <div><span>Bloco 4</span><b>Rapidez de verdade</b><p>Caching, imagens, lazy loading, N+1, paginação</p></div>
+  </div>
+</section>
+
+<!-- 13. Saída para a lojinha -->
+<section class="slide">
+  <div class="meio">
+    <div class="rotulo">Agora, de verdade</div>
+    <h1>A mesma requisição,<br>na lojinha e no monitor.</h1>
+    <p class="texto mono" style="font-size:20pt">localhost:5173 · localhost:5173/monitor</p>
+  </div>
+</section>
+
+<!-- 14. Fechamento -->
+<section class="slide">
+  <div class="meio">
+    <div class="rotulo">Para levar</div>
+    <h1>A experiência do usuário<br>é decidida <span class="a">nas duas pontas</span>.</h1>
+  </div>
+</section>
+
+<!-- 15. Links e perguntas -->
+<section class="slide">
+  <div class="rotulo">Perguntas?</div>
+  <h1>Obrigado.</h1>
+  <div class="links">
+    <div class="principal">
+      <div class="qr" data-url="https://adriangpo.github.io/minicurso-lojinha-ux/03-material/apostila/apostila.pdf"></div>
+      <b>A apostila</b><span>encurtador.com.br/vwap</span>
+    </div>
+    <div><div class="qr peq" data-url="https://github.com/adriangpo/lojinha-ux"></div><b>Lojinha UX</b><span>github.com/adriangpo/lojinha-ux</span></div>
+    <div><div class="qr peq" data-url="https://github.com/adriangpo/minicurso-lojinha-ux"></div><b>Roteiro do curso</b><span>github.com/adriangpo/minicurso-lojinha-ux</span></div>
+    <div><b>Adrian Gustavo de Paiva Oliveira</b><span>linkedin.com/in/adriangpo</span><b>Pedro Ferreira</b><span>linkedin.com/in/pedro-ferreira021</span></div>
+  </div>
+</section>
+
+</body>
+</html>

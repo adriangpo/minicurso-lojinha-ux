@@ -1,0 +1,2035 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Do Clique à API: UX de Verdade — apostila</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Fira+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #fff; }
+  body {
+    --acento: #b4321f; --tinta: #111; --cinza: #666; --claro: #d2d2d2;
+    color: var(--tinta);
+    font: 10.3pt/1.5 "Fira Sans", Arial, sans-serif;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  @page {
+    size: A4; margin: 22mm 18mm 24mm 22mm;
+    @top-left { content: "Do Clique à API: UX de Verdade"; font: 8.5pt "Fira Sans", sans-serif; color: #666; }
+    @bottom-right { content: counter(page); font: 500 9pt "Fira Sans", sans-serif; color: #111; }
+  }
+  /* Capa com 3 mm de sangria em cada borda: 216 x 303 mm, corte em 210 x 297 (TrimBox gravado pelo paginar.py) */
+  @page capa { size: 216mm 303mm; margin: 0; @top-left { content: none; } @bottom-right { content: none; } }
+  @page divisor { @top-left { content: none; } }
+
+  section { break-before: page; position: relative; }
+  section.capa { break-before: auto; }
+
+  /* Texto com coluna de notas */
+  .texto { padding-right: 48mm; }
+  p { margin-bottom: 2.6mm; hyphens: auto; orphans: 3; widows: 3; }
+  i { font-style: italic; }
+  .abertura { margin: 6mm -48mm 9mm 0; border-top: .5pt solid var(--tinta); padding-top: 4mm; }
+  .capitulo { font-size: 10pt; color: var(--acento); font-weight: 500; }
+  h1 { font-size: 22pt; font-weight: 600; line-height: 1.15; margin-top: 1.5mm; letter-spacing: -.005em; }
+  h2 { font-size: 12pt; font-weight: 600; margin: 7mm 0 2mm; break-after: avoid; }
+  h2 .num { color: var(--acento); margin-right: 2.1mm; }
+
+  code { font-family: "Fira Mono", monospace; font-size: .86em; background: #f1f2f4; border-radius: 3px; padding: .2mm 1mm; }
+  pre {
+    font: 8.4pt/1.5 "Fira Mono", monospace;
+    background: #f6f8fa; border: .6pt solid #d8dde3; border-radius: 4px;
+    padding: 3.5mm 4mm; margin: 3.5mm -48mm 4mm 0;
+    white-space: pre; break-inside: avoid;
+  }
+  pre[data-lado]::before {
+    content: attr(data-lado); display: block;
+    font: 500 7.8pt/1.3 "Fira Sans", sans-serif; color: var(--cinza); letter-spacing: .01em;
+    margin: -.8mm 0 2.6mm; padding-bottom: 1.8mm; border-bottom: .5pt solid #d8dde3;
+  }
+  a.ref { color: inherit; text-decoration: underline; text-decoration-color: #bbb; text-decoration-thickness: .5pt; text-underline-offset: .7mm; }
+  pre code { background: none; padding: 0; font-size: 1em; border-radius: 0; }
+  .hljs-keyword, .hljs-built_in, .hljs-selector-tag, .hljs-tag { color: #cf222e; }
+  .hljs-title, .hljs-title.function_, .hljs-name, .hljs-selector-class { color: #8250df; }
+  .hljs-string, .hljs-regexp { color: #0a3069; }
+  .hljs-subst { color: #24292f; }
+  .hljs-comment { color: #6e7781; font-style: italic; }
+  .hljs-number, .hljs-literal, .hljs-attr, .hljs-property, .hljs-attribute, .hljs-variable { color: #0550ae; }
+  .hljs-params { color: #24292f; }
+
+  figure { margin: 6mm -48mm 6mm 0; break-inside: avoid; text-align: center; }
+  figure svg { display: block; width: 100%; height: auto; }
+  figcaption { font-size: 8.8pt; margin-top: 3mm; color: #333; }
+  .nota { float: right; clear: right; width: 40mm; margin-right: -48mm; font-size: 8.4pt; line-height: 1.4; color: #444; }
+  .nota em { color: var(--acento); font-style: normal; font-weight: 500; }
+
+  table { border-collapse: collapse; width: calc(100% + 48mm); margin: 3.5mm -48mm 4.5mm 0; font-size: 9pt; line-height: 1.4; break-inside: avoid; }
+  th { font-weight: 600; text-align: left; border-top: .5pt solid var(--tinta); border-bottom: .5pt solid var(--tinta); padding: 1.5mm 3mm 1.5mm 0; }
+  td { padding: 1.5mm 3mm 1.5mm 0; vertical-align: top; border-bottom: .3pt solid var(--claro); }
+  tr:last-child td { border-bottom: .5pt solid var(--tinta); }
+
+  svg text { font-family: "Fira Sans", sans-serif; }
+
+  /* Capa (faixa vermelha em cima, pé branco) */
+  .capa { page: capa; width: 216mm; height: 303mm; display: flex; flex-direction: column; overflow: hidden; }
+  .capa .cor { background: var(--acento); color: #fff; padding: 25mm 21mm 16mm 25mm; height: 208mm; display: flex; flex-direction: column; }
+  .capa .topo { font-size: 10pt; font-weight: 500; }
+  .capa h1 { font-size: 54pt; font-weight: 600; line-height: 1.02; letter-spacing: -.02em; margin-top: auto; }
+  .capa .sub { font-size: 14pt; font-weight: 300; line-height: 1.4; margin-top: 9mm; max-width: 145mm; color: rgba(255,255,255,.88); }
+  .capa .pe { padding: 0 21mm 23mm 25mm; flex: 1; display: flex; flex-direction: column; }
+  .capa .rodape { margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end; gap: 10mm; }
+  .capa .autores { font-size: 10pt; line-height: 1.5; font-weight: 500; }
+  .capa .qr-bloco { display: flex; gap: 4mm; align-items: flex-end; font-size: 8.5pt; line-height: 1.4; text-align: right; color: #666; }
+  .capa .qr-bloco b { font-weight: 500; display: block; color: var(--tinta); }
+  .qr { width: 24mm; height: 24mm; }
+  .qr svg { width: 100%; height: 100%; display: block; }
+
+  /* Sumário (no modelo do LaTeX: entradas de capítulo sem pontilhado, temas recuados com pontilhado) */
+  .sumario .abertura { margin-bottom: 6mm; }
+  .sumario ol { list-style: none; margin-right: -48mm; }
+  .sumario li a { display: flex; align-items: baseline; color: inherit; text-decoration: none; }
+  .sumario .cap { font-size: 10.3pt; font-weight: 600; line-height: 1.5; margin-top: 3.6mm; }
+  .sumario .cap .rot { width: 15mm; flex: none; }
+  .sumario .cap .pag { font-weight: 600; }
+  .sumario .sec { font-size: 10pt; line-height: 1.55; padding-left: 15mm; }
+  .sumario .sec .n { width: 8mm; flex: none; color: var(--acento); font-variant-numeric: tabular-nums; }
+  .sumario .pontos { flex: 1; overflow: hidden; white-space: nowrap; direction: rtl; color: #999; margin: 0 1.5mm 0 2mm; }
+  .sumario .pontos::after { content: ". . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . ."; }
+  .sumario .cap .vazio { flex: 1; }
+  .sumario .pag { min-width: 7mm; text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* Abertura de bloco */
+  .divisor { page: divisor; }
+  .divisor .conteudo { padding-top: 60mm; padding-right: 48mm; }
+  .divisor .rotulo { font-size: 11pt; color: var(--acento); font-weight: 500; }
+  .divisor h1 { font-size: 34pt; margin-top: 2mm; letter-spacing: -.015em; }
+  .divisor p { font-size: 12pt; font-weight: 300; line-height: 1.5; margin-top: 7mm; }
+  .divisor ol { list-style: none; margin-top: 12mm; border-top: .5pt solid var(--tinta); padding-top: 3mm; }
+  .divisor li { display: grid; grid-template-columns: 9mm 1fr auto; font-size: 10.5pt; line-height: 2; }
+  .divisor li span:first-child { color: var(--acento); font-weight: 500; }
+  .divisor li span:last-child { color: var(--cinza); font-size: 9pt; }
+
+  /* Checklist */
+  .checklist h2 { font-size: 10.5pt; margin: 6mm 0 1mm; border-bottom: .5pt solid var(--tinta); padding-bottom: 1mm; }
+  .checklist ol { list-style: none; }
+  .checklist li { display: grid; grid-template-columns: 6mm 8mm 1fr; align-items: baseline; padding: 1.6mm 0; border-bottom: .3pt solid var(--claro); font-size: 9.8pt; line-height: 1.4; break-inside: avoid; }
+  .checklist li .caixa { width: 3.6mm; height: 3.6mm; border: .7pt solid var(--tinta); transform: translateY(.6mm); }
+  .checklist li .n { color: var(--acento); font-weight: 500; }
+
+  /* Referências */
+  .referencias ol { list-style: none; }
+  .referencias li { margin-bottom: 1.8mm; font-size: 9.6pt; line-height: 1.38; break-inside: avoid; }
+  .referencias li .url { display: block; font-family: "Fira Mono", monospace; font-size: 8pt; color: var(--cinza); }
+</style>
+</head>
+<body>
+
+<!-- ================= CAPA ================= -->
+<section class="capa">
+  <div class="cor">
+    <div class="topo">Apostila do minicurso</div>
+    <h1>Do Clique à API: <br>UX de Verdade</h1>
+    <p class="sub">22 problemas de experiência do usuário vistos dos dois lados, frontend e API, cada um na versão ruim e na versão boa.</p>
+  </div>
+  <div class="pe">
+    <div class="rodape">
+      <div class="autores">Adrian Gustavo de Paiva Oliveira<br>Pedro Ferreira</div>
+      <div class="qr-bloco">
+        <div><b>Lojinha UX</b>o código das demos<br>github.com/adriangpo/lojinha-ux</div>
+        <div class="qr" data-url="https://github.com/adriangpo/lojinha-ux"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= COMO USAR ================= -->
+<section class="texto" data-cab="Como usar a apostila" id="como-usar">
+  <div class="abertura">
+    <div class="capitulo">Antes de começar</div>
+    <h1>Como usar a apostila</h1>
+  </div>
+  <p>Esta apostila acompanha o minicurso Do Clique à API: UX de Verdade, mas foi escrita para ser lida também por quem não estava na sala. São 22 temas, na ordem da aula, divididos em quatro blocos que seguem a vida de uma ação: antes do clique, durante a espera, quando dá errado e o que deixa tudo rápido.</p>
+  <p>Cada tema começa dizendo o que é e segue sempre a mesma ordem: o problema, contado com um caso da lojinha; por que ele acontece; a solução, com o título dizendo se ela mora no front ou na API; os cuidados; e um teste para fazer no seu projeto. A etiqueta acima do título diz onde o tema se resolve: Frontend, API ou Frontend + API. A metade dos problemas de experiência do usuário é decidida longe da tela.</p>
+  <div class="nota"><em>Na lojinha,</em> cada tema tem uma página própria, com as versões num seletor no canto superior direito.</div>
+  <p>A lojinha é a aplicação usada nas demonstrações: uma loja pequena, com uma página por tema e cada versão, ruim e boa, num arquivo próprio. O código completo está no repositório do QR da capa, e o capítulo final explica como rodar tudo na sua máquina. Os códigos desta apostila são versões curtas, feitas para explicar a ideia; os da lojinha são os completos.</p>
+  <p>As notas na margem ligam o texto à aula, à lojinha e a outros temas. As figuras são desenhos, não prints. Os quadros mostram a tela em momentos diferentes, como uma tira de quadrinhos. As linhas do tempo mostram as requisições como o monitor da aula: cada barra vai do envio até a resposta, e a faixa “na tela” mostra o que a pessoa está vendo. Nas duas, o vermelho marca o que deu errado.</p>
+  <p>No fim há um checklist com os 22 temas em forma de pergunta, para passar no seu projeto depois.</p>
+</section>
+
+<!-- ================= SUMÁRIO ================= -->
+<section class="texto sumario" data-cab="Sumário" id="sumario">
+  <div class="abertura">
+    <div class="capitulo">Do Clique à API</div>
+    <h1>Sumário</h1>
+  </div>
+  <ol>
+    <li class="cap"><a href="#como-usar"><span>Como usar a apostila</span><span class="vazio"></span><span class="pag" data-alvo="como-usar"></span></a></li>
+    <li class="cap"><a href="#nielsen"><span>Os limites de tempo</span><span class="vazio"></span><span class="pag" data-alvo="nielsen"></span></a></li>
+  </ol>
+  <ol data-bloco="1"></ol>
+  <ol data-bloco="2"></ol>
+  <ol data-bloco="3"></ol>
+  <ol data-bloco="4"></ol>
+  <ol>
+    <li class="cap"><a href="#checklist"><span>Checklist para o seu projeto</span><span class="vazio"></span><span class="pag" data-alvo="checklist"></span></a></li>
+    <li class="cap"><a href="#rodar"><span>Como rodar a lojinha</span><span class="vazio"></span><span class="pag" data-alvo="rodar"></span></a></li>
+    <li class="cap"><a href="#referencias"><span>Referências</span><span class="vazio"></span><span class="pag" data-alvo="referencias"></span></a></li>
+  </ol>
+</section>
+
+<!-- ================= NIELSEN ================= -->
+<section class="texto" data-cab="Os limites de tempo" id="nielsen">
+  <div class="abertura">
+    <div class="capitulo">Antes de começar</div>
+    <h1>Os limites de tempo</h1>
+  </div>
+  <p>Quase todo tema desta apostila volta a três números. Eles foram resumidos por Jakob Nielsen em 1993, a partir de pesquisas mais antigas sobre atenção, e continuam valendo porque falam de gente, não de tecnologia: 0,1 segundo, 1 segundo e 10 segundos.</p>
+  <figure>
+    <div data-fig="nielsen"></div>
+    <figcaption>Figura 0.1. Os três limites e os temas em que cada um aparece.</figcaption>
+  </figure>
+  <p>Até 0,1 segundo, a resposta parece instantânea: a pessoa sente que o clique causou o efeito diretamente, sem nenhuma espera no meio. É o limite do coração que fica vermelho no <a class="ref" href="#t9">Optimistic UI</a> (tema 9) e do botão que muda para “Enviando…” no <a class="ref" href="#t14">clique duplo</a> (tema 14).</p>
+  <p>Até 1 segundo, a pessoa percebe que esperou, mas o raciocínio não se interrompe. Não precisa de aviso especial; precisa que a tela não fique em branco nem pule. É o território do <a class="ref" href="#t5">skeleton</a> (tema 5), do <a class="ref" href="#t6">layout shift</a> (tema 6) e do cache, que faz a volta a uma tela já vista ficar abaixo desse limite (tema 18, <a class="ref" href="#t18">Caching</a>).</p>
+  <p>Até 10 segundos, a atenção ainda se mantém na tarefa, desde que a tela mostre que algo está acontecendo. Passou disso, a pessoa vai fazer outra coisa, e a tela precisa mostrar progresso de verdade e avisar quando terminar. É o limite do <a class="ref" href="#t11">upload com progresso</a> (tema 11) e do <a class="ref" href="#t12">timeout</a> (tema 12), que existe justamente para a tela não ficar girando além dele.</p>
+  <p>Os números não são regras de engenharia. Eles servem para perguntar, diante de cada espera: em qual dessas faixas ela cai, e o que a tela está mostrando enquanto isso?</p>
+</section>
+
+<!-- ================= BLOCO 1 ================= -->
+<section class="divisor" id="b1" data-bloco="1">
+  <div class="conteudo">
+    <div class="rotulo">Bloco 1</div>
+    <h1>Antes do clique</h1>
+    <p>Antes de a pessoa clicar, a tela já pode evitar boa parte dos problemas: conferir o que foi digitado, deixar a API explicar o que recusou e guardar na URL o que a pessoa escolheu.</p>
+    <ol></ol>
+  </div>
+</section>
+
+<!-- Tema 1 -->
+<section class="texto tema" id="t1" data-tema="1" data-bloco="1" data-etiqueta="Frontend" data-nome="Formulários e validação" data-cab="Tema 1 · Formulários">
+  <div class="abertura">
+    <div class="capitulo">Tema 1 · Frontend</div>
+    <h1>Formulários e validação</h1>
+  </div>
+  <p>Validar um formulário é conferir os dados antes de enviá-los e dizer à pessoa o que está faltando, no lugar certo e na hora certa. Uma parte dessa conferência só o servidor consegue fazer; o resto dá para resolver na própria tela, sem esperar resposta nenhuma.</p>
+
+  <h2><span class="num">1.1</span> O problema</h2>
+  <div class="nota" id="t01-versoes" data-fonte="04-apps/web/src/temas.ts 04-apps/web/src/temas/formularios/BotaoSempreHabilitado.tsx 04-apps/web/src/temas/formularios/CadastroSoNoServidor.tsx 04-apps/web/src/temas/formularios/ErroAoSairDoCampo.tsx"><em>Na lojinha,</em> o tema tem três versões: Só no servidor, Botão sempre habilitado e Erro ao sair do campo.</div>
+  <p>O cadastro de produto da lojinha pede nome, categoria e preço. Na primeira versão, o botão Cadastrar está sempre liberado e o front não confere nada. A pessoa preenche só o nome, clica, espera a ida e a volta até a API e só então descobre que faltou a categoria. Se a mensagem vier genérica, ainda precisa adivinhar qual campo. E se o formulário for limpo depois do erro, digita tudo de novo.</p>
+  <figure id="t01-figura-1" data-fonte="04-apps/web/src/temas/formularios/BotaoSempreHabilitado.tsx 04-apps/web/src/temas/formularios/CadastroSoNoServidor.tsx 04-apps/web/src/temas/formularios/ErroAoSairDoCampo.tsx">
+    <div data-fig="t1"></div>
+    <figcaption>Figura 1.1. As três versões, da pior para a melhor. Nas duas primeiras, logo depois do clique em Cadastrar só com o nome; na última, quando a pessoa sai da categoria sem escolher.</figcaption>
+  </figure>
+
+  <h2><span class="num">1.2</span> Por que acontece</h2>
+  <p>Quando toda a conferência fica no servidor, o erro só aparece depois de uma viagem pela rede, e a pessoa já tirou a atenção do formulário. Os dados para decidir se o nome está vazio ou se o preço é maior que zero já estão na tela; não há motivo para perguntar isso à API.</p>
+  <p>O outro motivo é o momento do aviso. Se os erros aparecem assim que a página abre, a pessoa vê o formulário em vermelho antes de digitar a primeira letra. Se aparecem só no envio, ela descobre tudo de uma vez, no fim. O momento certo é quando ela termina um campo: entrou, saiu e deixou inválido. Campo em que ela ainda não chegou não mostra nada.</p>
+
+  <h2><span class="num">1.3</span> No front: avisar campo a campo</h2>
+  <p>Os erros saem dos próprios valores, a cada mudança, e não precisam de estado próprio. O que precisa de estado é a lista de campos em que a pessoa já entrou e saiu, os <i>campos tocados</i> (<i>touched</i>, no vocabulário das bibliotecas de formulário): só eles mostram erro. Enquanto houver pendência, o botão fica com cara de desabilitado, mas continua clicável. O clique não envia: marca todos os campos como tocados, para os erros aparecerem de uma vez, e leva o foco ao primeiro que falta.</p>
+<pre id="t01-codigo-1" data-fonte="04-apps/web/src/temas/formularios/ErroAoSairDoCampo.tsx" data-lado="Frontend · Navegador"><code class="language-javascript">function errosDo(produto) {
+  const erros = {}
+  if (!produto.nome.trim()) erros.nome = 'Informe o nome do produto'
+  if (!produto.categoria) erros.categoria = 'Escolha uma categoria'
+  if (!(produto.preco &gt; 0)) erros.preco = 'Informe um preço maior que zero'
+  return erros
+}
+
+// Um campo só mostra erro depois que a pessoa entrou nele e saiu
+campo.addEventListener('blur', () =&gt; { tocados.add(campo.name); mostrarErros() })
+
+formulario.addEventListener('submit', (evento) =&gt; {
+  evento.preventDefault()
+  const pendentes = Object.keys(errosDo(lerProduto()))
+  if (pendentes.length &gt; 0) {             // clicou no botão cinza: não envia, explica
+    pendentes.forEach((nome) =&gt; tocados.add(nome))
+    mostrarErros()
+    formulario.elements[pendentes[0]].focus()
+    return
+  }
+  enviar()
+})</code></pre>
+  <p>Durante o envio, o botão troca para “Enviando…” e um segundo clique não faz nada. Se a API falhar, nada é apagado: a mensagem diz que os dados continuam ali e que dá para tentar de novo.</p>
+
+  <h2><span class="num">1.4</span> Cuidados</h2>
+  <div class="nota"><em>Na aula,</em> a turma votou entre o botão sempre habilitado e o desabilitado antes de ver a última versão, que junta os dois lados.</div>
+  <p>Desabilitar o botão de verdade, com o atributo <code>disabled</code>, tem críticos. A equipe do GOV.UK, o sistema de design do governo britânico, recomenda nunca desabilitar: um botão cinza não explica o que falta, e algumas pessoas nem percebem que ele está desligado. Por isso a última versão só parece desabilitada. Ela usa <code>aria-disabled</code>, continua acessível pelo teclado e, no clique, mostra o que falta; com <code>disabled</code>, o clique nem chegaria ao código. E nunca marque o campo pendente só com cor.</p>
+  <p>A mensagem que aparece ao sair do campo ocupa espaço. Sem reservar a altura dela, o erro surge e empurra o campo de baixo bem quando a pessoa vai clicar nele, e o clique erra o alvo. A versão da lojinha deixa cada campo com a altura de quem já tem erro, o mesmo cuidado do tema 6, <a class="ref" href="#t6">Layout shift</a>.</p>
+  <p>Nenhuma versão dispensa a validação do servidor. Qualquer um pode chamar a API sem passar pela tela, e algumas regras só o banco conhece, como um nome que já está em uso (tema 2, <a class="ref" href="#t2">Erros úteis</a>).</p>
+
+  <h2><span class="num">1.5</span> No seu projeto</h2>
+  <p>Abra um formulário e passe pelos campos com Tab, sem digitar nada. Os erros aparecem só nos campos por onde você passou, em todos ao mesmo tempo ou em nenhum? Depois preencha pela metade e clique em enviar com a aba Network aberta: se saiu uma requisição, a conferência está só no servidor.</p>
+</section>
+
+<!-- Tema 2 -->
+<section class="texto tema" id="t2" data-tema="2" data-bloco="1" data-etiqueta="API" data-nome="Erros úteis" data-cab="Tema 2 · Erros úteis">
+  <div class="abertura">
+    <div class="capitulo">Tema 2 · API</div>
+    <h1>Erros úteis</h1>
+  </div>
+  <p>Quando a API recusa uma requisição, a resposta precisa dizer duas coisas: o tipo de problema, pelo status code, e o que exatamente está errado, num formato que o front consiga usar sem ler a frase. Com um código fixo para cada erro e o nome do campo, a tela põe a mensagem certa embaixo do campo certo.</p>
+
+  <h2><span class="num">2.1</span> O problema</h2>
+  <div class="nota" id="t02-versoes" data-fonte="04-apps/web/src/temas.ts 04-apps/web/src/temas/erros-uteis/ErroGenerico.tsx 04-apps/web/src/temas/erros-uteis/ErroPorCampo.tsx 04-apps/web/src/temas/erros-uteis/FormularioDeCadastro.tsx 04-apps/api/src/rotas/novos-produtos.ts 04-apps/web/src/lib/api.ts"><em>Na lojinha,</em> o tema tem duas versões: Erro genérico e Erro com code por campo. O nome “Teclado mecânico” já existe no banco.</div>
+  <p>A pessoa tenta cadastrar um produto chamado Teclado mecânico. Esse nome já existe, e só o banco sabe disso. Na versão ruim, a API responde <code>500</code> com <code>{"erro": "invalid"}</code>, e o front, sem saber o que fazer com isso, mostra “Algo deu errado”. A pessoa não sabe se foi a internet, se o servidor caiu ou se foi algo que ela fez. Tenta de novo, do mesmo jeito, e recebe o mesmo erro.</p>
+  <figure id="t02-figura-1" data-fonte="04-apps/web/src/temas/erros-uteis/ErroGenerico.tsx 04-apps/web/src/temas/erros-uteis/ErroPorCampo.tsx 04-apps/web/src/temas/erros-uteis/FormularioDeCadastro.tsx 04-apps/api/src/rotas/novos-produtos.ts 04-apps/web/src/lib/api.ts">
+    <div data-fig="t2"></div>
+    <figcaption>Figura 2.1. O mesmo envio nas duas versões. Com o code por campo, a mensagem aparece onde está o problema.</figcaption>
+  </figure>
+
+  <h2><span class="num">2.2</span> Por que acontece</h2>
+  <p>O status code diz de quem é o problema. A família 4xx quer dizer que a requisição tem algo errado e que repetir igual não vai adiantar; a família 5xx quer dizer que o servidor falhou e que talvez dê certo mais tarde. Um <code>500</code> para um nome repetido diz o contrário da verdade: que o servidor quebrou, quando quem precisa mudar algo é a pessoa.</p>
+  <p>Os mais comuns no dia a dia: <code>400</code> para uma requisição mal formada, <code>401</code> para quem não tem sessão (tema 16, <a class="ref" href="#t16">Sessão expirada</a>), <code>403</code> para quem não tem permissão, <code>404</code> para o que não existe, <code>409</code> para conflito com o estado atual, <code>422</code> para dados que não passam na validação e <code>429</code> para excesso de requisições (tema 15, <a class="ref" href="#t15">Rate limiting</a>).</p>
+  <p>Só o status, porém, não basta. Um <code>422</code> diz que algum dado está errado, mas não qual nem por quê. Se o detalhe vier só numa frase, o front precisa procurar palavras no texto para saber o que aconteceu, e qualquer ajuste na frase quebra a tela.</p>
+
+  <h2><span class="num">2.3</span> Na API: status certo e um code para cada erro</h2>
+  <p>Toda resposta de erro tem o mesmo formato: uma lista <code>errors</code>, em que cada item traz um <code>code</code>, uma <code>message</code> e, quando o erro é de um campo, o <code>field</code>. O <i>code</i> é um nome fixo em maiúsculas, como <code>PRODUCT_NAME_TAKEN</code>, que não muda quando alguém reescreve a frase. A validação vem primeiro e responde <code>422</code> com todos os campos errados de uma vez; só com os dados certos a API consulta o banco, e o nome repetido vira <code>409</code>.</p>
+<pre id="t02-codigo-1" data-fonte="04-apps/api/src/rotas/novos-produtos.ts" data-lado="API · Servidor"><code class="language-javascript">app.post('/api/novos-produtos', async (req, res) =&gt; {
+  const errors = validar(req.body)              // [{ code, message, field }] ou []
+  if (errors.length &gt; 0) {
+    return res.status(422).json({ errors })      // os dados não passam
+  }
+
+  if (await nomeEmUso(req.body.nome)) {          // dados certos, mas o nome já existe
+    return res.status(409).json({ errors: [{
+      code: 'PRODUCT_NAME_TAKEN',
+      message: 'Já existe um produto com esse nome',
+      field: 'nome',
+    }] })
+  }
+
+  res.status(201).json(await salvar(req.body))
+})</code></pre>
+
+  <h2><span class="num">2.4</span> No front: o texto sai do code</h2>
+  <p>O front não lê a frase da API para decidir nada: ele compara o code. A mensagem que aparece na tela vem de uma tabela do próprio front, de code para texto, que pode virar a chave de tradução quando a aplicação tiver outros idiomas. Na lojinha, a frase do <code>PRODUCT_NAME_TAKEN</code> no front é diferente da que a API manda, de propósito, para mostrar quem decide o texto. Se chegar um code que o front ainda não conhece, ele usa a <code>message</code> da API.</p>
+<pre id="t02-codigo-2" data-fonte="04-apps/web/src/temas/erros-uteis/ErroPorCampo.tsx 04-apps/web/src/lib/api.ts" data-lado="Frontend · Navegador"><code class="language-javascript">const MENSAGENS = {
+  PRODUCT_NAME_REQUIRED: 'Informe o nome do produto',
+  PRODUCT_NAME_TAKEN: 'Já existe um produto com esse nome. Que tal um nome diferente?',
+  PRODUCT_CATEGORY_INVALID: 'Escolha uma das categorias',
+  PRODUCT_PRICE_INVALID: 'Informe um preço maior que zero',
+}
+
+const resposta = await fetch('/api/novos-produtos', { method: 'POST', body, headers })
+if (resposta.status === 422 || resposta.status === 409) {
+  const { errors } = await resposta.json()
+  for (const { code, message, field } of errors) {
+    mostrarErroNoCampo(field, MENSAGENS[code] ?? message)   // code novo: usa a da API
+  }
+} else if (!resposta.ok) {
+  mostrarAviso((await resposta.json()).erro ?? 'Erro inesperado')   // 503 e afins
+}</code></pre>
+
+  <h2><span class="num">2.5</span> Cuidados</h2>
+  <p>O code é um contrato. Depois que o front depende de <code>PRODUCT_NAME_TAKEN</code>, renomear o code quebra a tela, como renomear um campo da API. Pelo mesmo motivo, um code genérico para tudo, como <code>VALIDATION_ERROR</code>, devolve o front ao problema de ler a frase.</p>
+  <p>A mensagem é para gente. Ela não deve trazer stack trace, nome de tabela ou SQL, que só ajudam quem quer atacar a API. E o formato precisa ser o mesmo em todas as rotas, para o front tratar erro num lugar só; se quiser um formato pronto, existe um padrão para isso, o Problem Details (RFC 9457).</p>
+  <p>Separar 4xx de 5xx também decide o que fazer depois. Um <code>422</code> não melhora repetindo; um <code>503</code> talvez melhore em alguns segundos, e o front pode tentar de novo sozinho (tema 13, <a class="ref" href="#t13">Retries e exponential backoff</a>).</p>
+
+  <h2><span class="num">2.6</span> No seu projeto</h2>
+  <p>Mande para a sua API, por curl ou Insomnia, um cadastro com um campo inválido. Qual status volta? Dá para saber, só pela resposta e sem ler a frase, qual campo corrigir e por quê?</p>
+</section>
+
+<!-- Tema 3 -->
+<section class="texto tema" id="t3" data-tema="3" data-bloco="1" data-etiqueta="Frontend" data-nome="URL como estado" data-cab="Tema 3 · URL como estado">
+  <div class="abertura">
+    <div class="capitulo">Tema 3 · Frontend</div>
+    <h1>URL como estado</h1>
+  </div>
+  <p>Filtros, busca, página atual e aba escolhida são estado da tela. Quando esse estado fica só na memória do componente, ele some no F5 e não vai junto quando alguém copia o link. Guardar esse estado na URL resolve as duas coisas.</p>
+
+  <h2><span class="num">3.1</span> O problema</h2>
+  <div class="nota" id="t03-versoes" data-fonte="04-apps/web/src/temas.ts 04-apps/web/src/temas/url-como-estado/FiltrosNaUrl.tsx 04-apps/web/src/temas/url-como-estado/FiltrosNoEstado.tsx"><em>Na lojinha,</em> o tema tem duas versões: Filtros no useState e Filtros na URL.</div>
+  <p>Na lojinha, a pessoa busca “garrafa” e escolhe a categoria Casa. Acha a garrafa térmica e manda o link para um amigo, que abre a loja na primeira categoria, sem busca nenhuma. Ela mesma dá F5 para atualizar o preço e perde o filtro. O botão Voltar do navegador também não volta para o que ela estava vendo.</p>
+  <figure id="t03-figura-1" data-fonte="04-apps/web/src/temas/url-como-estado/FiltrosNaUrl.tsx 04-apps/web/src/temas/url-como-estado/FiltrosNoEstado.tsx">
+    <div data-fig="t3"></div>
+    <figcaption>Figura 3.1. Com os filtros só na memória, o F5 volta ao começo. Com os filtros na URL, eles voltam junto.</figcaption>
+  </figure>
+
+  <h2><span class="num">3.2</span> Por que acontece</h2>
+  <p>Um <code>useState</code>, ou qualquer variável em JavaScript, vive na memória daquela aba. O F5 recria a página do zero e essa memória vai embora. O link copiado só carrega o que está escrito na URL, e se os filtros não estão lá, quem abre o link vê a página inicial.</p>
+
+  <h2><span class="num">3.3</span> No front: ler e escrever os filtros na URL</h2>
+  <p>A tela lê os filtros da URL ao abrir e, a cada mudança, escreve de volta, sem recarregar a página. Em React com React Router, o <code>useSearchParams</code> faz as duas coisas.</p>
+<pre id="t03-codigo-1" data-fonte="04-apps/web/src/temas/url-como-estado/FiltrosNaUrl.tsx" data-lado="Frontend · Navegador"><code class="language-javascript">// Ao abrir (e depois de um F5): os filtros vêm da URL
+const parametros = new URLSearchParams(location.search)
+const busca = parametros.get('busca') ?? ''
+const categoria = parametros.get('categoria') ?? 'Eletrônicos'
+
+// Ao mudar um filtro: atualiza a URL sem recarregar
+function mudarFiltro(nome, valor) {
+  const url = new URL(location.href)
+  if (valor) url.searchParams.set(nome, valor)
+  else url.searchParams.delete(nome)
+  history.replaceState(null, '', url)    // ?busca=garrafa&amp;categoria=Casa
+}</code></pre>
+
+  <h2><span class="num">3.4</span> Cuidados</h2>
+  <p>A diferença entre <code>replaceState</code> e <code>pushState</code> aparece no Voltar. Com <code>push</code> a cada tecla, o Voltar desfaz a busca letra por letra; para campos de texto, use <code>replace</code>. Para escolhas feitas com clique, como a página da lista, <code>push</code> pode ser o que a pessoa espera.</p>
+  <p>Ponha na URL só o que faz sentido compartilhar. Ela vai para o histórico, para logs de servidor e para quem recebe o link; token e dado pessoal não entram. E trate o que vem da URL como entrada de usuário: qualquer um pode editar. Um link compartilhado também pode abrir uma busca que não encontra nada, e a tela precisa dizer isso direito (tema 4, <a class="ref" href="#t4">Estados da tela</a>).</p>
+
+  <h2><span class="num">3.5</span> No seu projeto</h2>
+  <p>Filtre uma lista, dê F5 e depois cole o link numa aba anônima. A tela volta igual nos dois casos?</p>
+</section>
+
+<!-- ================= BLOCO 2 ================= -->
+<section class="divisor" id="b2" data-bloco="2">
+  <div class="conteudo">
+    <div class="rotulo">Bloco 2</div>
+    <h1>Durante a espera</h1>
+    <p>Entre o clique e a resposta existe um intervalo que pode durar 50 milissegundos ou 30 segundos. O que a tela mostra nesse intervalo decide se a espera parece curta, se a pessoa clica de novo ou se ela acaba vendo o resultado errado.</p>
+    <ol></ol>
+  </div>
+</section>
+
+<!-- Tema 4 -->
+<section class="texto tema" id="t4" data-tema="4" data-bloco="2" data-etiqueta="Frontend" data-nome="Estados da tela" data-cab="Tema 4 · Estados da tela">
+  <div class="abertura">
+    <div class="capitulo">Tema 4 · Frontend</div>
+    <h1>Estados da tela</h1>
+  </div>
+  <p>Toda tela que busca dados passa por quatro estados: carregando, erro, vazio e sucesso. Em geral só o último é desenhado com cuidado; os outros três ficam como uma área em branco ou um “nada encontrado” solto.</p>
+
+  <h2><span class="num">4.1</span> O problema</h2>
+  <div class="nota" id="t04-versoes" data-fonte="04-apps/web/src/temas.ts 04-apps/web/src/temas/estados-da-tela/ListaComEstados.tsx 04-apps/web/src/temas/estados-da-tela/ListaSemEstados.tsx"><em>Na lojinha,</em> o tema tem duas versões: Tela branca e Quatro estados. Para ver o erro, use a taxa de erro em 100% no monitor; para o vazio, busque “xyz”.</div>
+  <p>Na versão ruim da lojinha, a lista de produtos mostra a mesma coisa em três situações diferentes: enquanto carrega, quando a API falha e quando a busca não encontra nada. Nas três, uma área em branco. A pessoa não sabe se espera, se tenta de novo ou se muda a busca, e quase sempre escolhe a pior opção: recarregar a página.</p>
+  <figure id="t04-figura-1" data-fonte="04-apps/web/src/temas/estados-da-tela/ListaComEstados.tsx 04-apps/web/src/temas/estados-da-tela/ListaSemEstados.tsx">
+    <div data-fig="t4"></div>
+    <figcaption>Figura 4.1. Os três estados que costumam ser esquecidos, cada um com o seu desenho. O quarto é a lista.</figcaption>
+  </figure>
+
+  <h2><span class="num">4.2</span> Por que acontece</h2>
+  <p>O código costuma nascer pensando no caminho feliz. Com <code>const [produtos, setProdutos] = useState([])</code>, a lista vazia do começo é igual à lista vazia de uma busca sem resultado, e se a promise falha sem <code>catch</code>, o erro simplesmente some. A tela não tem como desenhar estados que o código não distingue.</p>
+
+  <h2><span class="num">4.3</span> No front: um desenho para cada estado</h2>
+  <p>O carregando mostra que algo está acontecendo. O erro diz o que houve, em palavras de gente, e oferece “Tentar de novo”. O vazio explica por que não há nada e sugere o próximo passo, como conferir a grafia ou ver todos os produtos. Só depois vem a lista.</p>
+<pre id="t04-codigo-1" data-fonte="04-apps/web/src/temas/estados-da-tela/ListaComEstados.tsx" data-lado="Frontend · Navegador"><code class="language-javascript">if (carregando) return mostrarCarregando()
+
+if (erro) return mostrarErro('Não foi possível carregar os produtos.', tentarDeNovo)
+
+if (produtos.length === 0) {
+  return mostrarVazio(`Nenhum produto encontrado para “${busca}”`, verTodos)
+}
+
+return mostrarLista(produtos)</code></pre>
+  <p>Bibliotecas como o TanStack Query já entregam esses estados separados, como <code>isPending</code>, <code>isError</code> e <code>refetch</code>, e evitam boa parte dos esquecimentos.</p>
+
+  <h2><span class="num">4.4</span> Cuidados</h2>
+  <p>A ordem das perguntas importa: o erro vem antes do vazio, porque uma lista vazia por falha não é “nenhum produto encontrado”. E o vazio de uma busca é diferente do vazio de uma conta nova; o primeiro sugere mudar a busca, o segundo sugere criar o primeiro item.</p>
+  <p>O estado que a pessoa mais vê é o de carregando, e o jeito de desenhá-lo muda a sensação de quanto tempo passou (tema 5, <a class="ref" href="#t5">Skeleton loading</a>).</p>
+
+  <h2><span class="num">4.5</span> No seu projeto</h2>
+  <p>Em cada tela que carrega dados, force os três casos: DevTools em Offline para o erro, uma busca absurda para o vazio e a rede em Slow 4G para o carregando. Cada um tem um desenho próprio?</p>
+</section>
+
+<!-- Tema 5 -->
+<section class="texto tema" id="t5" data-tema="5" data-bloco="2" data-etiqueta="Frontend" data-nome="Skeleton loading" data-cab="Tema 5 · Skeleton loading">
+  <div class="abertura">
+    <div class="capitulo">Tema 5 · Frontend</div>
+    <h1>Skeleton loading</h1>
+  </div>
+  <p>Skeleton é o esqueleto da tela desenhado antes de os dados chegarem: blocos cinza no formato do que vai aparecer. O tempo de espera é o mesmo de um spinner, mas a sensação é de que a página já está quase pronta.</p>
+
+  <h2><span class="num">5.1</span> O problema</h2>
+  <div class="nota" id="t05-versoes" data-fonte="04-apps/web/src/temas.ts 04-apps/web/src/temas/skeleton/ListaComSkeleton.tsx 04-apps/web/src/temas/skeleton/ListaComSpinner.tsx"><em>Na lojinha,</em> o tema tem duas versões: Spinner e Skeleton. Use a latência de 1 s no monitor.</div>
+  <p>Na lojinha, trocar de categoria leva um segundo. Na versão com spinner, a lista some, um círculo gira no meio de uma área vazia e, de repente, tudo aparece de uma vez, empurrando o que estava em volta. A espera parece mais longa do que é, e o salto no fim faz a pessoa perder o ponto onde estava olhando.</p>
+  <figure id="t05-figura-1" data-fonte="04-apps/web/src/temas/skeleton/ListaComSkeleton.tsx 04-apps/web/src/temas/skeleton/ListaComSpinner.tsx">
+    <div data-fig="t5"></div>
+    <figcaption>Figura 5.1. A mesma espera de um segundo. O skeleton já tem o formato da lista que vai chegar.</figcaption>
+  </figure>
+
+  <h2><span class="num">5.2</span> Por que acontece</h2>
+  <p>Entre um e dez segundos, a pessoa percebe a espera e procura sinais de que algo está andando. O spinner diz só “espere”, sem dizer o quê nem quanto. O skeleton mostra a estrutura: o olho já encontra onde vão ficar os nomes e os preços, e quando os dados chegam, eles ocupam um lugar que já existia.</p>
+
+  <h2><span class="num">5.3</span> No front: desenhar o skeleton no formato real</h2>
+  <p>O skeleton usa a mesma grade e os mesmos cards da lista, com blocos cinza no lugar de cada texto. Uma animação leve, pulsando, mostra que a página não travou.</p>
+<pre id="t05-codigo-1" data-fonte="04-apps/web/src/temas/skeleton/ListaComSkeleton.tsx" data-lado="Frontend · CSS"><code class="language-css">.osso {
+  background: #e9ecef;
+  border-radius: 4px;
+  animation: pulsar 1.5s ease-in-out infinite;
+}
+
+@keyframes pulsar { 50% { opacity: .5 } }</code></pre>
+<pre id="t05-codigo-2" data-fonte="04-apps/web/src/temas/skeleton/ListaComSkeleton.tsx" data-lado="Frontend · HTML"><code class="language-html">&lt;div class="card"&gt;
+  &lt;div class="osso" style="width: 70%; height: 16px"&gt;&lt;/div&gt;   &lt;!-- nome --&gt;
+  &lt;div class="osso" style="width: 100px; height: 22px"&gt;&lt;/div&gt;  &lt;!-- preço --&gt;
+&lt;/div&gt;</code></pre>
+
+  <h2><span class="num">5.4</span> Cuidados</h2>
+  <p>O skeleton serve para esperas curtas de conteúdo cujo formato você conhece. Para uma ação, como salvar, um botão “Salvando…” diz mais. Para esperas longas, a pessoa precisa de progresso de verdade (tema 11, <a class="ref" href="#t11">Upload com progresso e tempo real</a>). E se a resposta costuma chegar em menos de 300 ms, o skeleton aparece e some tão rápido que vira um piscar; vale atrasar sua entrada.</p>
+  <p>Um skeleton de tamanho diferente da tela real vira, ele mesmo, um salto quando os dados chegam. Esse salto tem nome e medida própria (tema 6, <a class="ref" href="#t6">Layout shift</a>).</p>
+
+  <h2><span class="num">5.5</span> No seu projeto</h2>
+  <p>Com a rede em Slow 4G, abra a tela principal. Durante a espera, dá para saber onde vai aparecer cada coisa? Quando os dados chegam, algo muda de lugar?</p>
+</section>
+
+<!-- Tema 6 -->
+<section class="texto tema" id="t6" data-tema="6" data-bloco="2" data-etiqueta="Frontend" data-nome="Layout shift" data-cab="Tema 6 · Layout shift">
+  <div class="abertura">
+    <div class="capitulo">Tema 6 · Frontend</div>
+    <h1>Layout shift</h1>
+  </div>
+  <p>Layout shift é quando um elemento muda de lugar depois que a página já apareceu, porque algo carregou acima ou ao lado dele. O Google mede isso numa das Core Web Vitals, o CLS (Cumulative Layout Shift), que também pesa na posição do site na busca.</p>
+
+  <h2><span class="num">6.1</span> O problema</h2>
+  <div class="nota" id="t06-versoes" data-fonte="04-apps/web/src/temas.ts 04-apps/web/src/temas/layout-shift/ImagemComEspacoReservado.tsx 04-apps/web/src/temas/layout-shift/ImagemSemTamanho.tsx"><em>Na lojinha,</em> o tema tem duas versões: Imagem sem tamanho e Espaço reservado. Use a latência Aleatória no monitor.</div>
+  <p>A lojinha mostra uma grade de produtos com foto, nome e botão Comprar. As fotos não têm tamanho declarado e chegam uma a uma, em momentos diferentes. A pessoa mira no Comprar da Caixa de som Bluetooth, a foto termina de carregar bem nessa hora, tudo desce, e o clique cai na foto, ou no botão de outro produto.</p>
+  <figure id="t06-figura-1" data-fonte="04-apps/web/src/temas/layout-shift/ImagemComEspacoReservado.tsx 04-apps/web/src/temas/layout-shift/ImagemSemTamanho.tsx">
+    <div data-fig="t6"></div>
+    <figcaption>Figura 6.1. O cursor fica parado. Sem espaço reservado, a foto chega e empurra o botão para baixo do cursor.</figcaption>
+  </figure>
+
+  <h2><span class="num">6.2</span> Por que acontece</h2>
+  <p>O navegador desenha a página antes de saber o tamanho de tudo. Uma <code>&lt;img&gt;</code> sem <code>width</code> e <code>height</code> começa com altura zero; quando o arquivo chega, o navegador descobre o tamanho e redesenha, empurrando o que vem depois. O mesmo acontece com banners, anúncios, avisos inseridos no topo e fontes que trocam de tamanho ao carregar.</p>
+
+  <h2><span class="num">6.3</span> No front: reservar o espaço</h2>
+  <p>Basta dizer a proporção antes de a imagem chegar. Com <code>width</code> e <code>height</code> no HTML, o navegador calcula a altura pela largura disponível e guarda o lugar; o CSS ainda pode deixar a imagem ocupar a largura toda.</p>
+<pre id="t06-codigo-1" data-fonte="04-apps/web/src/temas/layout-shift/ImagemComEspacoReservado.tsx" data-lado="Frontend · HTML"><code class="language-html">&lt;!-- width e height dão a proporção (4:3) antes de a imagem chegar --&gt;
+&lt;img src="/api/imagens/11" alt="Caixa de som Bluetooth"
+     width="640" height="480"
+     style="width: 100%; height: auto"&gt;</code></pre>
+  <p>Para avisos e banners que chegam depois, o caminho é reservar a altura deles desde o começo ou mostrá-los por cima do conteúdo, sem empurrar nada.</p>
+
+  <h2><span class="num">6.4</span> Cuidados</h2>
+  <p>Mudança causada pelo próprio clique da pessoa, como abrir um menu, não conta como problema; o CLS ignora o que acontece logo depois de uma interação. O problema é o que se mexe sem a pessoa pedir.</p>
+  <p>Reservar o espaço é obrigatório no lazy loading. Sem altura, o navegador acha que todas as imagens cabem na tela e baixa todas de uma vez (tema 20, <a class="ref" href="#t20">Lazy loading</a>).</p>
+
+  <h2><span class="num">6.5</span> No seu projeto</h2>
+  <p>No DevTools, abra Rendering e ligue Layout Shift Regions: o que se mover fica pintado de azul. Recarregue a página com a rede em Slow 4G e observe. O Lighthouse também mostra o valor do CLS.</p>
+</section>
+
+<!-- Tema 7 -->
+<section class="texto tema" id="t7" data-tema="7" data-bloco="2" data-etiqueta="Frontend" data-nome="Debounce e throttle" data-cab="Tema 7 · Debounce e throttle">
+  <div class="abertura">
+    <div class="capitulo">Tema 7 · Frontend</div>
+    <h1>Debounce e throttle</h1>
+  </div>
+  <p>Os dois limitam quantas vezes uma função roda quando um evento dispara em rajada. O debounce espera a rajada acabar e roda uma vez só, no fim. O throttle roda no máximo uma vez a cada intervalo, durante a rajada.</p>
+
+  <h2><span class="num">7.1</span> O problema</h2>
+  <div class="nota" id="t07-versoes" data-fonte="04-apps/web/src/temas.ts 04-apps/web/src/temas/debounce/BuscaComDebounce.tsx 04-apps/web/src/temas/debounce/BuscaSemDebounce.tsx 04-apps/web/src/temas/debounce/ListaRolavel.tsx 04-apps/web/src/temas/debounce/ScrollComThrottle.tsx 04-apps/web/src/temas/debounce/ScrollSemThrottle.tsx"><em>Na lojinha,</em> o tema tem quatro versões: Sem debounce, Com debounce, Scroll sem throttle e Scroll com throttle.</div>
+  <p>A busca da lojinha filtra enquanto a pessoa digita. Sem debounce, cada tecla dispara uma requisição: “fone de ouvido” são 14 teclas e 14 requisições, das quais só a última interessa. A lista pisca a cada letra, a API trabalha catorze vezes e, no celular, o plano de dados paga.</p>
+  <figure id="t07-figura-1" data-fonte="04-apps/web/src/temas/debounce/BuscaComDebounce.tsx 04-apps/web/src/temas/debounce/BuscaSemDebounce.tsx 04-apps/web/src/temas/debounce/ListaRolavel.tsx 04-apps/web/src/temas/debounce/ScrollComThrottle.tsx 04-apps/web/src/temas/debounce/ScrollSemThrottle.tsx">
+    <div data-fig="t7"></div>
+    <figcaption>Figura 7.1. As mesmas quatro teclas. Com debounce, a busca só sai depois de 400 ms sem digitar.</figcaption>
+  </figure>
+
+  <h2><span class="num">7.2</span> Por que acontece</h2>
+  <p>O evento <code>input</code> dispara a cada tecla, e <code>scroll</code> e <code>resize</code> disparam dezenas de vezes por segundo. Código que reage direto a cada evento faz trabalho que vai ser jogado fora logo em seguida: a busca de “fon” não interessa a quem está digitando “fone”.</p>
+
+  <h2><span class="num">7.3</span> No front: debounce na busca, throttle no scroll</h2>
+  <p>O debounce reinicia um timer a cada tecla; a função só roda quando o timer chega ao fim sem ser interrompido. Entre 300 e 500 ms é o intervalo usual para digitação.</p>
+<pre id="t07-codigo-1" data-fonte="04-apps/web/src/hooks/useDebounce.ts 04-apps/web/src/temas/debounce/BuscaComDebounce.tsx" data-lado="Frontend · Navegador"><code class="language-javascript">function debounce(funcao, atraso) {
+  let timer
+  return (...args) =&gt; {
+    clearTimeout(timer)                         // chegou outra tecla: recomeça a contar
+    timer = setTimeout(() =&gt; funcao(...args), atraso)
+  }
+}
+
+campo.addEventListener('input', debounce((e) =&gt; buscar(e.target.value), 400))</code></pre>
+  <p>O throttle serve quando a tela precisa reagir durante o movimento, e não só no fim, como uma barra que acompanha o scroll. Ele deixa passar uma chamada e ignora as seguintes até o intervalo acabar.</p>
+<pre id="t07-codigo-2" data-fonte="04-apps/web/src/hooks/useThrottle.ts 04-apps/web/src/temas/debounce/ScrollComThrottle.tsx" data-lado="Frontend · Navegador"><code class="language-javascript">function throttle(funcao, intervalo) {
+  let ultimaVez = 0
+  return (...args) =&gt; {
+    if (Date.now() - ultimaVez &lt; intervalo) return  // ainda dentro do intervalo: ignora
+    ultimaVez = Date.now()
+    funcao(...args)
+  }
+}
+
+window.addEventListener('scroll', throttle(atualizarPosicao, 200))</code></pre>
+
+  <h2><span class="num">7.4</span> Cuidados</h2>
+  <p>Debounce alto demais faz a busca parecer lenta, porque nada acontece até a pessoa parar. E o throttle simples acima pode perder o último evento, deixando a tela um passo atrás; a versão da lojinha agenda a última chamada para o fim do intervalo.</p>
+  <p>O debounce diminui quantas requisições saem, mas não garante a ordem em que as respostas voltam. E em cliques ele não serve: um clique é uma escolha, e atrasá-lo só deixa a tela lenta. Quando a resposta antiga chega depois da nova, o problema é outro (tema 8, <a class="ref" href="#t8">Race conditions e AbortController</a>).</p>
+
+  <h2><span class="num">7.5</span> No seu projeto</h2>
+  <p>Com a aba Network aberta, digite uma palavra na busca do seu sistema. Quantas requisições saíram?</p>
+</section>
+
+<!-- Tema 8 -->
+<section class="texto tema" id="t8" data-tema="8" data-bloco="2" data-etiqueta="Frontend" data-nome="Race conditions e AbortController" data-cab="Tema 8 · Race conditions">
+  <div class="abertura">
+    <div class="capitulo">Tema 8 · Frontend</div>
+    <h1>Race conditions e AbortController</h1>
+  </div>
+  <p>Uma <i>race condition</i> acontece quando duas operações correm ao mesmo tempo e o resultado depende de qual termina primeiro. No front, o caso típico é a tela pedir uma coisa nova à API antes de a anterior responder: as respostas chegam fora de ordem e a mais lenta apaga a mais recente. O <code>AbortController</code> é o recurso do navegador para cancelar a requisição que deixou de interessar.</p>
+
+  <h2><span class="num">8.1</span> O problema</h2>
+  <div class="nota" id="t08-versoes" data-fonte="04-apps/web/src/temas.ts 04-apps/web/src/temas/race-condition/AbasDeCategorias.tsx 04-apps/web/src/temas/race-condition/CliquesComCancelamento.tsx 04-apps/web/src/temas/race-condition/CliquesSemCancelamento.tsx 04-apps/web/src/temas/race-condition/CorridaDosCliques.tsx 04-apps/web/src/temas/race-condition/categoriaLenta.ts"><em>Na lojinha,</em> o tema tem duas versões: Sem cancelamento e Com AbortController. Eletrônicos sempre demora 2 s; as outras categorias, 0,3 s.</div>
+  <p>A lojinha separa os produtos em abas de categoria. A pessoa clica em Eletrônicos, muda de ideia e clica em Casa logo em seguida. Os produtos de Casa aparecem quase na hora, e tudo parece certo. Ela começa a olhar a lista e, dois segundos depois, a lista troca sozinha: a aba marcada continua sendo Casa, mas a tela mostra fones, teclados e monitores.</p>
+  <p>Ninguém clicou em nada errado. Quem não percebe a troca pode pôr no carrinho algo achando que é de outra categoria; quem percebe passa a desconfiar da loja e recarrega a página para garantir.</p>
+  <figure id="t08-figura-1" data-fonte="04-apps/web/src/temas/race-condition/AbasDeCategorias.tsx 04-apps/web/src/temas/race-condition/CliquesComCancelamento.tsx 04-apps/web/src/temas/race-condition/CliquesSemCancelamento.tsx 04-apps/web/src/temas/race-condition/CorridaDosCliques.tsx 04-apps/web/src/temas/race-condition/categoriaLenta.ts">
+    <div data-fig="t8a"></div>
+    <figcaption>Figura 8.1. A mesma tela em três momentos. Aos 0,4 s está certa; aos 2 s, a aba diz Casa e a lista é de Eletrônicos.</figcaption>
+  </figure>
+
+  <h2><span class="num">8.2</span> Por que acontece</h2>
+  <div class="nota"><em>Ver também</em> o tema 7, <a class="ref" href="#t7">Debounce e throttle</a>, que resolve outro problema: requisições demais enquanto se digita.</div>
+  <p>Cada clique dispara um <code>fetch</code>, e os <code>fetch</code> não sabem uns dos outros. O navegador não tem como saber que o clique em Casa tornou a resposta de Eletrônicos inútil, e a rede não promete ordem. Uma categoria com mais produtos, uma consulta mais pesada ou um servidor mais ocupado bastam para a primeira resposta chegar depois da segunda. Se o código guarda na tela qualquer resposta que chega, a última a chegar ganha, e ela nem sempre é a do último clique.</p>
+  <p>A figura 8.2 mostra os dois cliques no tempo. Cada barra vai do clique até a resposta; a faixa de baixo é o que a tela está mostrando.</p>
+  <figure id="t08-figura-2" data-fonte="04-apps/web/src/temas/race-condition/AbasDeCategorias.tsx 04-apps/web/src/temas/race-condition/CliquesComCancelamento.tsx 04-apps/web/src/temas/race-condition/CliquesSemCancelamento.tsx 04-apps/web/src/temas/race-condition/CorridaDosCliques.tsx 04-apps/web/src/temas/race-condition/categoriaLenta.ts">
+    <div data-fig="t8b"></div>
+    <figcaption>Figura 8.2. Os dois cliques no tempo, sem e com cancelamento.</figcaption>
+  </figure>
+  <p>Debounce não ajuda aqui. Ele serve para quem digita, em que as letras do meio não interessam. Um clique numa aba é uma escolha, e atrasar cada clique só deixaria a tela mais lenta.</p>
+
+  <h2><span class="num">8.3</span> No front: cancelar a requisição anterior</h2>
+  <p>A saída é tratar a requisição antiga como descartável assim que chega um clique novo. O <code>fetch</code> recebe o <code>signal</code> de um <code>AbortController</code>; quando o código chama <code>abort()</code>, o navegador fecha a requisição e a promise falha com um erro chamado <code>AbortError</code>. A resposta velha nunca chega ao código que atualiza a tela.</p>
+<pre id="t08-codigo-1" data-fonte="04-apps/web/src/temas/race-condition/CliquesComCancelamento.tsx" data-lado="Frontend · Navegador"><code class="language-javascript">let controle
+
+async function escolherCategoria(categoria) {
+  marcarAba(categoria)
+  controle?.abort()                 // cancela a requisição do clique anterior
+  controle = new AbortController()
+
+  try {
+    const resposta = await fetch(`/api/produtos?categoria=${categoria}`, {
+      signal: controle.signal,
+    })
+    mostrarProdutos(await resposta.json())
+  } catch (erro) {
+    if (erro.name !== 'AbortError') throw erro  // cancelamos de propósito
+  }
+}</code></pre>
+  <p>O <code>catch</code> precisa separar os dois casos. O cancelamento foi pedido pelo próprio código e não é falha; qualquer outro erro continua sendo erro e deve aparecer para o usuário. Em React, o controller do clique anterior precisa sobreviver entre um render e outro, então ele fica num <code>useRef</code>; o resto é igual.</p>
+  <p>Quando cancelar não é possível, por exemplo com uma biblioteca que não aceita <code>signal</code>, dá para chegar ao mesmo resultado ignorando a resposta: guarde a categoria junto com os produtos e só mostre se ela ainda for a aba marcada.</p>
+
+  <h2><span class="num">8.4</span> Cuidados</h2>
+  <div class="nota"><em>Na aula,</em> o monitor mostrou a barra de Eletrônicos cancelada no navegador enquanto a API seguia até o fim e respondia 200.</div>
+  <p>Cancelar no navegador não para o servidor. O <code>abort()</code> fecha a conexão do lado do cliente; a API já recebeu a requisição, consulta o banco do mesmo jeito e responde <code>200</code> para ninguém. Numa leitura simples, tudo bem. Se a consulta for cara, a API pode perceber que a conexão fechou e interromper o trabalho, mas isso é decisão do servidor.</p>
+  <p>Pelo mesmo motivo, cancelar só serve para leituras. Abortar o <code>POST</code> de um Pix não desfaz o Pix: ele pode já ter saído. Para ações que mudam dados, o caminho é outro (tema 14, <a class="ref" href="#t14">Clique duplo e idempotência</a>).</p>
+
+  <h2><span class="num">8.5</span> No seu projeto</h2>
+  <p>Abra o DevTools, coloque a rede em Slow 4G e clique rápido entre abas, filtros ou páginas de uma lista. Se a tela nem sempre termina mostrando o que foi clicado por último, falta cancelar ou descartar as respostas antigas.</p>
+</section>
+
+<!-- Tema 9 -->
+<section class="texto tema" id="t9" data-tema="9" data-bloco="2" data-etiqueta="Frontend + API" data-nome="Optimistic UI" data-cab="Tema 9 · Optimistic UI">
+  <div class="abertura">
+    <div class="capitulo">Tema 9 · Frontend + API</div>
+    <h1>Optimistic UI</h1>
+  </div>
+  <p>Optimistic UI é mudar a tela antes de a API responder, apostando que ela vai aceitar. Se a resposta vier com erro, a tela volta atrás e avisa. Serve para ações pequenas que quase sempre dão certo, como curtir, favoritar ou marcar como lida.</p>
+
+  <h2><span class="num">9.1</span> O problema</h2>
+  <div class="nota" id="t09-versoes" data-fonte="04-apps/web/src/temas.ts 04-apps/web/src/temas/optimistic-ui/FavoritarEsperando.tsx 04-apps/web/src/temas/optimistic-ui/FavoritarNaHora.tsx 04-apps/api/src/rotas/favoritos.ts"><em>Na lojinha,</em> o tema tem duas versões: Espera a API e Muda na hora. Use a latência de 1 s e depois a taxa de erro em 100%.</div>
+  <p>Na lojinha, cada produto tem um coração para favoritar. Na versão que espera a API, com a latência de um segundo, a pessoa clica e nada acontece. Um segundo parado depois de um clique parece defeito, então ela clica de novo, e o segundo clique desfaz o primeiro.</p>
+  <figure id="t09-figura-1" data-fonte="04-apps/web/src/temas/optimistic-ui/FavoritarEsperando.tsx 04-apps/web/src/temas/optimistic-ui/FavoritarNaHora.tsx 04-apps/api/src/rotas/favoritos.ts">
+    <div data-fig="t9"></div>
+    <figcaption>Figura 9.1. Esperando a API, o coração demora; mudando na hora, ele responde ao clique e só volta se a API recusar.</figcaption>
+  </figure>
+
+  <h2><span class="num">9.2</span> Por que acontece</h2>
+  <p>Quando a tela só muda depois da resposta, o tempo do clique passa a depender da rede. Até 0,1 segundo a pessoa sente que causou o efeito; um segundo depois, ela já não liga uma coisa à outra. Numa ação que dá certo em quase todos os casos, esperar a confirmação é pagar sempre por um erro que quase nunca acontece.</p>
+
+  <h2><span class="num">9.3</span> No front: mudar antes, desfazer se falhar</h2>
+  <p>A tela muda no clique. A requisição sai em seguida, e se ela falhar, a tela volta ao estado anterior e diz o que aconteceu. Voltar calado seria pior do que esperar.</p>
+<pre id="t09-codigo-1" data-fonte="04-apps/web/src/temas/optimistic-ui/FavoritarNaHora.tsx" data-lado="Frontend · Navegador"><code class="language-javascript">async function alternarFavorito(produto) {
+  const favoritar = !favoritos.has(produto.id)
+  marcar(produto.id, favoritar)                        // 1. muda na hora
+
+  try {
+    const resposta = await fetch(`/api/favoritos/${produto.id}`, {
+      method: favoritar ? 'PUT' : 'DELETE',
+    })
+    if (!resposta.ok) throw new Error(resposta.status)
+  } catch {
+    marcar(produto.id, !favoritar)                     // 2. a API recusou: desfaz e avisa
+    avisar(`Não foi possível favoritar “${produto.nome}”. Tente de novo.`)
+  }
+}</code></pre>
+
+  <h2><span class="num">9.4</span> Na API: uma operação que pode chegar duas vezes</h2>
+  <p>Com a tela respondendo na hora, a API precisa aguentar cliques rápidos e repetidos. Por isso favoritar é <code>PUT /favoritos/7</code> e desfavoritar é <code>DELETE /favoritos/7</code>, e não um <code>POST /favoritos/7/alternar</code>. Com “alternar”, duas requisições iguais voltam ao começo; com <code>PUT</code> e <code>DELETE</code>, repetir dá no mesmo, porque os dois são idempotentes. No banco, o <code>PUT</code> vira um <code>INSERT ... ON CONFLICT DO NOTHING</code>, e o <code>DELETE</code> apaga se existir.</p>
+
+  <h2><span class="num">9.5</span> Cuidados</h2>
+  <p>Optimistic UI é para ações reversíveis e com alta chance de sucesso. Pagamento, envio de mensagem importante ou qualquer coisa que dependa de uma validação do servidor ficam de fora: mostrar “pago” e depois voltar atrás é pior do que esperar dois segundos.</p>
+  <p>Quando a ação não aparece na própria tela, como adicionar algo a um carrinho que está em outra página, mudar o coração não basta, e a pessoa precisa de outra confirmação (tema 10, <a class="ref" href="#t10">Feedback de sucesso</a>).</p>
+
+  <h2><span class="num">9.6</span> No seu projeto</h2>
+  <p>Com a rede em Slow 4G, clique em curtir ou favoritar. A tela responde antes de a requisição terminar? Agora coloque o DevTools em Offline e clique de novo: a tela volta e avisa?</p>
+</section>
+
+<!-- Tema 10 -->
+<section class="texto tema" id="t10" data-tema="10" data-bloco="2" data-etiqueta="Frontend" data-nome="Feedback de sucesso" data-cab="Tema 10 · Feedback de sucesso">
+  <div class="abertura">
+    <div class="capitulo">Tema 10 · Frontend</div>
+    <h1>Feedback de sucesso</h1>
+  </div>
+  <p>Depois de uma ação, a pessoa precisa de um sinal de que deu certo. Esse sinal tem que ser visível sem atrapalhar: nem silêncio, nem um alerta que trava a tela só para dizer “Sucesso!”.</p>
+
+  <h2><span class="num">10.1</span> O problema</h2>
+  <div class="nota" id="t10-versoes" data-fonte="04-apps/web/src/temas.ts 04-apps/web/src/temas/feedback-de-sucesso/AlertaQueBloqueia.tsx 04-apps/web/src/temas/feedback-de-sucesso/ComToast.tsx 04-apps/web/src/temas/feedback-de-sucesso/NadaAcontece.tsx 04-apps/web/src/temas/feedback-de-sucesso/VitrineDoCarrinho.tsx 04-apps/web/src/temas/feedback-de-sucesso/carrinho.ts"><em>Na lojinha,</em> o tema tem três versões: Nada acontece, Alerta que bloqueia e Toast.</div>
+  <p>Na lojinha, o botão Adicionar ao carrinho tem três versões. Na primeira, o produto vai para o carrinho, mas a tela não muda; a pessoa clica de novo e fica com dois. Na segunda, abre uma janela “Sucesso!” com um botão OK: o sinal existe, mas cada produto custa um clique a mais e tira a pessoa do que ela estava fazendo. Na terceira, uma confirmação aparece num canto e some sozinha.</p>
+  <figure id="t10-figura-1" data-fonte="04-apps/web/src/temas/feedback-de-sucesso/AlertaQueBloqueia.tsx 04-apps/web/src/temas/feedback-de-sucesso/ComToast.tsx 04-apps/web/src/temas/feedback-de-sucesso/NadaAcontece.tsx 04-apps/web/src/temas/feedback-de-sucesso/VitrineDoCarrinho.tsx 04-apps/web/src/temas/feedback-de-sucesso/carrinho.ts">
+    <div data-fig="t10"></div>
+    <figcaption>Figura 10.1. A mesma ação nas três versões. O toast confirma sem pedir nada à pessoa.</figcaption>
+  </figure>
+
+  <h2><span class="num">10.2</span> Por que acontece</h2>
+  <p>Algumas ações não mudam nada na tela que a pessoa está vendo: o carrinho está em outra página, o e-mail foi para outra pessoa, o arquivo foi salvo num servidor. Sem sinal, ela repete a ação ou acha que falhou. O alerta que bloqueia resolve o sinal, mas exige um clique para continuar, e com o tempo a pessoa aprende a fechá-lo sem ler.</p>
+
+  <h2><span class="num">10.3</span> No front: confirmação discreta</h2>
+  <p>O toast aparece num canto, diz o que aconteceu com o nome do item, some sozinho em uns três segundos e não impede nada. Se existir um contador do carrinho no cabeçalho, ele também muda na hora. Na lojinha, o toast vem do Mantine.</p>
+<pre id="t10-codigo-1" data-fonte="04-apps/web/src/temas/feedback-de-sucesso/ComToast.tsx" data-lado="Frontend · Navegador"><code class="language-javascript">import { notifications } from '@mantine/notifications'
+
+async function adicionar(produto) {
+  const { itens } = await adicionarAoCarrinho(produto)
+
+  notifications.show({
+    title: 'Adicionado ao carrinho',
+    message: `${produto.nome} · ${itens} ${itens === 1 ? 'item' : 'itens'} no carrinho`,
+    autoClose: 3000,                     // some sozinho, sem pedir clique
+  })
+}</code></pre>
+
+  <h2><span class="num">10.4</span> Cuidados</h2>
+  <p>Toast é para confirmar, não para erro que exige ação: um erro que precisa ser resolvido fica na tela até ser resolvido. Leitores de tela só anunciam o toast se ele estiver numa região com <code>role="status"</code> ou <code>aria-live</code>; bibliotecas como o Mantine já fazem isso. E quando dá para mostrar o resultado na própria tela, como um botão que passa a indicar que o item já está no carrinho, isso costuma ser melhor que qualquer aviso.</p>
+  <p>Para ações que demoram, um “pronto” no fim não basta: a pessoa precisa acompanhar o caminho (tema 11, <a class="ref" href="#t11">Upload com progresso e tempo real</a>).</p>
+
+  <h2><span class="num">10.5</span> No seu projeto</h2>
+  <p>Faça cada ação importante do seu sistema, como salvar, adicionar e enviar, olhando só para a tela. Dá para saber que funcionou sem abrir outra página?</p>
+</section>
+
+<!-- Tema 11 -->
+<section class="texto tema" id="t11" data-tema="11" data-bloco="2" data-etiqueta="Frontend + API" data-nome="Upload com progresso e tempo real" data-cab="Tema 11 · Upload">
+  <div class="abertura">
+    <div class="capitulo">Tema 11 · Frontend + API</div>
+    <h1>Upload com progresso e tempo real</h1>
+  </div>
+  <p>Subir um arquivo tem duas esperas: o envio dos bytes, que o navegador consegue medir, e o processamento no servidor, que só a API conhece. Para mostrar o progresso da segunda, o servidor precisa contar novidades ao front, e há três jeitos de fazer isso: short polling, long polling e SSE.</p>
+
+  <h2><span class="num">11.1</span> O problema</h2>
+  <div class="nota" id="t11-versoes" data-fonte="04-apps/web/src/temas.ts 04-apps/web/src/temas/upload/BarraDaFase.tsx 04-apps/web/src/temas/upload/ComLongPolling.tsx 04-apps/web/src/temas/upload/ComPolling.tsx 04-apps/web/src/temas/upload/ComSse.tsx 04-apps/web/src/temas/upload/EscolherArquivo.tsx 04-apps/web/src/temas/upload/SemProgresso.tsx 04-apps/web/src/temas/upload/enviarArquivo.ts 04-apps/api/src/rotas/uploads.ts"><em>Na lojinha,</em> o tema tem quatro versões: Sem progresso, Short polling, Long polling e SSE. Use um arquivo de uns 10 MB.</div>
+  <p>Na lojinha, a pessoa sobe uma foto de 10 MB. Na versão sem progresso, o botão gira enquanto o arquivo vai e depois a tela fica parada em “Arquivo recebido. Estamos processando.”, enquanto o servidor passa uns doze segundos verificando o arquivo, gerando as miniaturas e otimizando a imagem. Ela não sabe se travou. Fecha a aba ou manda o arquivo de novo.</p>
+  <figure id="t11-figura-1" data-fonte="04-apps/web/src/temas/upload/BarraDaFase.tsx 04-apps/web/src/temas/upload/ComLongPolling.tsx 04-apps/web/src/temas/upload/ComPolling.tsx 04-apps/web/src/temas/upload/ComSse.tsx 04-apps/web/src/temas/upload/EscolherArquivo.tsx 04-apps/web/src/temas/upload/SemProgresso.tsx 04-apps/web/src/temas/upload/enviarArquivo.ts 04-apps/api/src/rotas/uploads.ts">
+    <div data-fig="t11a"></div>
+    <figcaption>Figura 11.1. Sem progresso, a tela não diz nada depois do envio. Com progresso, cada fase tem a sua barra.</figcaption>
+  </figure>
+
+  <h2><span class="num">11.2</span> Por que acontece</h2>
+  <p>Na primeira fase, quem sabe quantos bytes já foram é o navegador, e ele avisa pelo evento <code>xhr.upload.onprogress</code>; o <code>fetch</code> não expõe o progresso de envio de forma simples. Na segunda fase, só o servidor sabe em que ponto está, e no HTTP comum quem pergunta é sempre o cliente. A figura 11.2 compara os três jeitos de o front ficar sabendo.</p>
+  <figure id="t11-figura-2" data-fonte="04-apps/web/src/temas/upload/BarraDaFase.tsx 04-apps/web/src/temas/upload/ComLongPolling.tsx 04-apps/web/src/temas/upload/ComPolling.tsx 04-apps/web/src/temas/upload/ComSse.tsx 04-apps/web/src/temas/upload/EscolherArquivo.tsx 04-apps/web/src/temas/upload/SemProgresso.tsx 04-apps/web/src/temas/upload/enviarArquivo.ts 04-apps/api/src/rotas/uploads.ts">
+    <div data-fig="t11b"></div>
+    <figcaption>Figura 11.2. As mesmas quatro novidades no servidor. O short polling chega atrasado e até pula a de 50%; o long polling espera numa pergunta só e não mostra o meio; o SSE mostra cada novidade na hora.</figcaption>
+  </figure>
+  <p>No short polling, o front pergunta de tempos em tempos e a API responde na hora, tenha novidade ou não. No long polling, o front pergunta uma vez e a API segura a resposta até o processamento terminar; se passar de 30 segundos, ela responde como está e o front pergunta de novo. No SSE (Server-Sent Events), o front abre uma conexão só e a API escreve nela cada mudança.</p>
+
+  <h2><span class="num">11.3</span> No front: medir o envio e escutar o processamento</h2>
+<pre id="t11-codigo-1" data-fonte="04-apps/web/src/temas/upload/enviarArquivo.ts" data-lado="Frontend · Navegador"><code class="language-javascript">const xhr = new XMLHttpRequest()
+xhr.upload.onprogress = (e) =&gt; mostrarEnvio(Math.round((e.loaded / e.total) * 100))
+xhr.onload = () =&gt; acompanhar(JSON.parse(xhr.responseText).id)
+xhr.open('POST', '/api/uploads')
+xhr.send(arquivo)
+
+function acompanhar(id) {
+  const fonte = new EventSource(`/api/uploads/${id}/eventos`)
+  fonte.onmessage = (mensagem) =&gt; {
+    const { progresso, etapa } = JSON.parse(mensagem.data)
+    mostrarProcessamento(progresso, etapa)        // "Gerando miniaturas · 50%"
+    if (progresso === 100) fonte.close()          // senão o EventSource reconecta
+  }
+}</code></pre>
+
+  <h2><span class="num">11.4</span> Na API: responder logo e avisar depois</h2>
+  <p>O <code>POST</code> do upload recebe o arquivo, registra o upload no banco, responde <code>201</code> com o id e deixa o processamento rodando à parte; a pessoa não fica presa numa requisição de uns doze segundos. Quem processa grava o progresso no banco, e o Postgres avisa a API com <code>NOTIFY</code>. A API escuta com <code>LISTEN</code> e repassa cada aviso pela conexão SSE.</p>
+<pre id="t11-codigo-2" data-fonte="04-apps/api/src/rotas/uploads.ts" data-lado="API · Servidor"><code class="language-javascript">app.get('/api/uploads/:id/eventos', (req, res) =&gt; {
+  res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache' })
+
+  const enviar = (status) =&gt; {
+    if (status.id !== Number(req.params.id)) return
+    res.write(`data: ${JSON.stringify(status)}\n\n`)
+  }
+  avisos.on('progresso', enviar)                  // avisos chegam do LISTEN do Postgres
+  req.on('close', () =&gt; avisos.off('progresso', enviar))
+})</code></pre>
+  <table>
+    <tr><th></th><th>Short polling</th><th>Long polling</th><th>SSE</th></tr>
+    <tr><td>Requisições</td><td>Uma a cada 2 s, mude ou não</td><td>Uma (mais uma a cada 30 s sem terminar)</td><td>Uma conexão só</td></tr>
+    <tr><td>Atraso da novidade</td><td>Até o intervalo inteiro</td><td>Quase nenhum</td><td>Quase nenhum</td></tr>
+    <tr><td>Progresso no meio</td><td>Aos saltos</td><td>Não tem</td><td>Cada etapa</td></tr>
+  </table>
+
+  <h2><span class="num">11.5</span> Cuidados</h2>
+  <p>Polling multiplica com o número de pessoas: mil usuários perguntando a cada dois segundos são 500 requisições por segundo, quase todas respondendo “nada mudou”. O long polling e o SSE trocam isso por uma conexão aberta por pessoa enquanto o processamento dura. O <code>EventSource</code> também não aceita headers próprios, então a autenticação vai por cookie.</p>
+  <p>Uma barra parada pode ser um servidor processando ou um servidor travado. Para o segundo caso, o front precisa de um limite de espera (tema 12, <a class="ref" href="#t12">Timeouts</a>).</p>
+
+  <h2><span class="num">11.6</span> No seu projeto</h2>
+  <p>Suba um arquivo grande com a rede em Slow 4G. Dá para ver quanto falta no envio? E depois que o envio termina, a tela diz o que está acontecendo?</p>
+</section>
+
+<!-- ================= BLOCO 3 ================= -->
+<section class="divisor" id="b3" data-bloco="3">
+  <div class="conteudo">
+    <div class="rotulo">Bloco 3</div>
+    <h1>Quando dá errado</h1>
+    <p>A rede cai, o servidor trava, a sessão expira, alguém clica duas vezes. Nenhuma dessas falhas é rara, e cada uma tem um jeito de não virar um “Algo deu errado” que apaga o trabalho da pessoa.</p>
+    <ol></ol>
+  </div>
+</section>
+
+<!-- Tema 12 -->
+<section class="texto tema" id="t12" data-tema="12" data-bloco="3" data-etiqueta="Frontend + API" data-nome="Timeouts" data-cab="Tema 12 · Timeouts">
+  <div class="abertura">
+    <div class="capitulo">Tema 12 · Frontend + API</div>
+    <h1>Timeouts</h1>
+  </div>
+  <p>Timeout é o tempo máximo que se aceita esperar por uma resposta. O <code>fetch</code> não tem um por padrão: se a API travar, ele espera para sempre, e o spinner gira junto.</p>
+
+  <h2><span class="num">12.1</span> O problema</h2>
+  <div class="nota" id="t12-versoes" data-fonte="04-apps/web/src/temas.ts 04-apps/web/src/temas/timeouts/ComTimeout.tsx 04-apps/web/src/temas/timeouts/EsperaParaSempre.tsx"><em>Na lojinha,</em> o tema tem duas versões: Espera para sempre e Com timeout. Use a latência Travada (30 s) no monitor.</div>
+  <p>Na lojinha, com a API travada, a lista de produtos fica no spinner. Dez segundos, vinte, trinta. A pessoa não sabe se é lentidão normal, se a internet caiu ou se a loja quebrou, e não há botão para tentar de novo. Ela recarrega a página, que trava do mesmo jeito, ou desiste da loja.</p>
+  <figure id="t12-figura-1" data-fonte="04-apps/web/src/temas/timeouts/ComTimeout.tsx 04-apps/web/src/temas/timeouts/EsperaParaSempre.tsx">
+    <div data-fig="t12"></div>
+    <figcaption>Figura 12.1. Esperando para sempre, o spinner continua aos 25 s. Com timeout de 5 s, a tela desiste, explica e oferece outra tentativa.</figcaption>
+  </figure>
+
+  <h2><span class="num">12.2</span> Por que acontece</h2>
+  <p>Servidores travam por motivos comuns: uma consulta lenta no banco, uma tabela bloqueada, um serviço externo que não responde. No celular, a conexão pode sumir sem ser fechada, e nenhum dos lados fica sabendo. Sem um limite no front, a tela espera o tempo que o pior desses casos durar, e passado o limite de dez segundos a pessoa já foi fazer outra coisa.</p>
+
+  <h2><span class="num">12.3</span> No front: desistir com explicação</h2>
+  <p><code>AbortSignal.timeout(5000)</code> cancela a requisição depois de cinco segundos, e o <code>fetch</code> falha com um erro de nome <code>TimeoutError</code>. Com isso, a tela consegue dizer a coisa certa: demorar demais é diferente de dar erro.</p>
+<pre id="t12-codigo-1" data-fonte="04-apps/web/src/temas/timeouts/ComTimeout.tsx" data-lado="Frontend · Navegador"><code class="language-javascript">try {
+  const resposta = await fetch('/api/produtos', { signal: AbortSignal.timeout(5000) })
+  mostrarProdutos(await resposta.json())
+} catch (erro) {
+  if (erro.name === 'TimeoutError') {
+    mostrarErro('O servidor está demorando mais que o normal.', tentarDeNovo)
+  } else {
+    mostrarErro('Não foi possível carregar os produtos.', tentarDeNovo)
+  }
+}</code></pre>
+
+  <h2><span class="num">12.4</span> Cuidados</h2>
+  <p>Timeout curto demais derruba operações que são lentas de verdade, como um relatório pesado ou um upload. Essas precisam de progresso (tema 11, <a class="ref" href="#t11">Upload com progresso e tempo real</a>), não de um limite fixo. E o timeout cancela no front, mas não no servidor (o mesmo ponto do tema 8, <a class="ref" href="#t8">Race conditions e AbortController</a>): se a operação gravava algo, ela pode ter terminado depois que a tela desistiu. A API também não deveria segurar uma requisição para sempre: um servidor que segura conexões travadas acaba sem conexões livres para quem chega depois.</p>
+  <p>O botão Tentar de novo resolve com um clique. O front também pode tentar sozinho, desde que saiba quando parar (tema 13, <a class="ref" href="#t13">Retries e exponential backoff</a>).</p>
+
+  <h2><span class="num">12.5</span> No seu projeto</h2>
+  <p>Faça uma rota da sua API demorar, com um <code>sleep</code> numa rota de teste, e abra a tela que a usa. Depois de quanto tempo a tela desiste? Ela desiste?</p>
+</section>
+
+<!-- Tema 13 -->
+<section class="texto tema" id="t13" data-tema="13" data-bloco="3" data-etiqueta="Frontend + API" data-nome="Retries e exponential backoff" data-cab="Tema 13 · Retries">
+  <div class="abertura">
+    <div class="capitulo">Tema 13 · Frontend + API</div>
+    <h1>Retries e exponential backoff</h1>
+  </div>
+  <p>Retry é tentar de novo, automaticamente, quando uma requisição falha por um problema passageiro. Exponential backoff é esperar cada vez mais entre as tentativas, 1 s, depois 2 s, depois 4 s, para não piorar um servidor que já está com dificuldade.</p>
+
+  <h2><span class="num">13.1</span> O problema</h2>
+  <div class="nota" id="t13-versoes" data-fonte="04-apps/web/src/temas.ts 04-apps/web/src/temas/retry/ComBackoff.tsx 04-apps/web/src/temas/retry/RetrySemParar.tsx 04-apps/web/src/temas/retry/SemRetry.tsx"><em>Na lojinha,</em> o tema tem três versões: Sem retry, Retry sem parar e Exponential backoff. Use a taxa de erro em 50% ou 100%.</div>
+  <p>Com a taxa de erro em 50%, a versão sem retry mostra erro em metade das vezes, mesmo que um segundo depois a API respondesse normalmente. A versão que tenta de novo sem parar faz o oposto: falhou, pergunta de novo na hora, para sempre. Com a API fora do ar, cada pessoa com a página aberta vira uma metralhadora de requisições, e a API, que talvez se recuperasse, não volta mais.</p>
+  <figure id="t13-figura-1" data-fonte="04-apps/web/src/temas/retry/ComBackoff.tsx 04-apps/web/src/temas/retry/RetrySemParar.tsx 04-apps/web/src/temas/retry/SemRetry.tsx">
+    <div data-fig="t13"></div>
+    <figcaption>Figura 13.1. Em cima, tentativas sem pausa. Embaixo, três tentativas com esperas de 1 s e 2 s; a terceira dá certo.</figcaption>
+  </figure>
+
+  <h2><span class="num">13.2</span> Por que acontece</h2>
+  <p>Muitas falhas são passageiras: um servidor reiniciando, um pico de acesso que faz a API responder <code>503</code>, a rede do celular piscando. Desistir na primeira transforma um soluço em erro. Tentar de novo na hora bate no servidor exatamente no pior momento, e quando milhares de clientes fazem isso juntos, a carga se multiplica.</p>
+
+  <h2><span class="num">13.3</span> No front: poucas tentativas, esperando o dobro</h2>
+  <p>A cada falha passageira, a espera dobra; depois da última, a tela desiste e mostra o erro. A lojinha usa esperas fixas; em produção, vale somar um pouco de aleatoriedade à espera, o <i>jitter</i>, para os clientes não voltarem todos no mesmo instante.</p>
+<pre id="t13-codigo-1" data-fonte="04-apps/web/src/temas/retry/ComBackoff.tsx" data-lado="Frontend · Navegador"><code class="language-javascript">const ESPERAS = [1000, 2000, 4000]
+
+async function buscarComRetry(url) {
+  for (let tentativa = 0; ; tentativa++) {
+    const resposta = await fetch(url).catch(() =&gt; null)        // null: falha de rede
+    if (resposta?.ok) return resposta.json()
+
+    const passageira = !resposta || resposta.status &gt;= 500
+    const espera = ESPERAS[tentativa]
+    if (!passageira || espera === undefined) throw new Error('Não foi possível carregar')
+
+    await new Promise((r) =&gt; setTimeout(r, espera))
+  }
+}</code></pre>
+
+  <h2><span class="num">13.4</span> Na API: dizer o que é passageiro</h2>
+  <p>O front só sabe se vale tentar de novo pelo que a API responde. Erro da requisição é 4xx e não adianta repetir; falha passageira é 5xx, e uma API sobrecarregada pode responder <code>503</code> com o header <code>Retry-After</code>, dizendo quantos segundos esperar. Um <code>500</code> genérico para tudo, como no tema 2, <a class="ref" href="#t2">Erros úteis</a>, faz o front repetir requisições que nunca vão dar certo.</p>
+
+  <h2><span class="num">13.5</span> Cuidados</h2>
+  <p>Retry só é seguro em operação que pode ser repetida. Buscar produtos pode repetir à vontade. Um <code>POST /transferencias</code> que falhou por timeout talvez tenha enviado o Pix antes da resposta se perder, e repeti-lo sem chave de idempotência pode enviar o Pix duas vezes (tema 14, <a class="ref" href="#t14">Clique duplo e idempotência</a>).</p>
+
+  <h2><span class="num">13.6</span> No seu projeto</h2>
+  <p>No DevTools, bloqueie uma URL da API (Network, botão direito, Block request URL) e desbloqueie alguns segundos depois. O front tentou de novo? Quantas vezes, e com que intervalo?</p>
+</section>
+
+<!-- Tema 14 -->
+<section class="texto tema" id="t14" data-tema="14" data-bloco="3" data-etiqueta="Frontend + API" data-nome="Clique duplo e idempotência" data-cab="Tema 14 · Clique duplo">
+  <div class="abertura">
+    <div class="capitulo">Tema 14 · Frontend + API</div>
+    <h1>Clique duplo e idempotência</h1>
+  </div>
+  <p>Uma operação é <i>idempotente</i> quando repeti-la dá o mesmo resultado que fazê-la uma vez. Mandar um Pix não é: dois envios iguais viram duas transferências. O front diminui a chance de o Pix sair duas vezes; a API garante que, se a mesma intenção chegar de novo, ela conta uma vez só.</p>
+
+  <h2><span class="num">14.1</span> O problema</h2>
+  <div class="nota" id="t14-versoes" data-fonte="04-apps/web/src/temas.ts 04-apps/web/src/temas/clique-duplo/BotaoTravado.tsx 04-apps/web/src/temas/clique-duplo/ComChaveDeIdempotencia.tsx 04-apps/web/src/temas/clique-duplo/ComChecagemDeDuplicado.tsx 04-apps/web/src/temas/clique-duplo/FormularioDePix.tsx 04-apps/web/src/temas/clique-duplo/SemProtecao.tsx 04-apps/web/src/temas/clique-duplo/TabelaDeTransferencias.tsx 04-apps/web/src/temas/clique-duplo/transferencias.ts 04-apps/api/src/rotas/transferencias.ts"><em>Na lojinha,</em> o tema tem quatro versões: Sem proteção, Botão travado, Chave de idempotência e Pix duplicado.</div>
+  <p>Na lojinha, a pessoa manda um Pix de R$ 50,00 para Maria Silva. O envio leva um segundo, e nesse segundo a tela não muda. Ela clica em Transferir de novo, e de novo. A tabela Pix no banco mostra três Pix de R$&nbsp;50,00: R$&nbsp;150,00 enviados no lugar de R$&nbsp;50,00.</p>
+  <figure id="t14-figura-1" data-fonte="04-apps/web/src/temas/clique-duplo/BotaoTravado.tsx 04-apps/web/src/temas/clique-duplo/ComChaveDeIdempotencia.tsx 04-apps/web/src/temas/clique-duplo/ComChecagemDeDuplicado.tsx 04-apps/web/src/temas/clique-duplo/FormularioDePix.tsx 04-apps/web/src/temas/clique-duplo/SemProtecao.tsx 04-apps/web/src/temas/clique-duplo/TabelaDeTransferencias.tsx 04-apps/web/src/temas/clique-duplo/transferencias.ts 04-apps/api/src/rotas/transferencias.ts">
+    <div data-fig="t14"></div>
+    <figcaption>Figura 14.1. Três cliques em Transferir. Sem proteção, três Pix; com o botão travado ou com a chave, um só.</figcaption>
+  </figure>
+
+  <h2><span class="num">14.2</span> Por que acontece</h2>
+  <p>Espera sem sinal gera clique repetido, mas nem toda repetição vem de um clique. O retry automático (tema 13, <a class="ref" href="#t13">Retries e exponential backoff</a>) reenvia, a rede pode reenviar e a pessoa pode abrir duas abas. A API recebe duas requisições iguais e, sem nenhuma informação a mais, não tem como saber que é o mesmo Pix.</p>
+
+  <h2><span class="num">14.3</span> No front: travar o botão e mandar uma chave</h2>
+  <p>Durante o envio, o botão mostra “Enviando…” e ignora novos cliques. Junto com o Pix vai uma chave de idempotência, no header <code style="white-space: nowrap">Idempotency-Key</code>, gerada uma vez por intenção de pagamento: todas as tentativas deste Pix mandam a mesma chave, e o próximo Pix ganha uma chave nova. Na lojinha, a versão com chave deixa o botão liberado de propósito, para mostrar que quem protege é a API.</p>
+<pre id="t14-codigo-1" data-fonte="04-apps/web/src/temas/clique-duplo/ComChaveDeIdempotencia.tsx 04-apps/web/src/temas/clique-duplo/BotaoTravado.tsx 04-apps/web/src/temas/clique-duplo/transferencias.ts" data-lado="Frontend · Navegador"><code class="language-javascript">let enviando = false
+let chave = crypto.randomUUID()                  // uma chave por intenção de pagamento
+
+async function transferir(pix) {
+  if (enviando) return                           // segundo clique: ignora
+  enviando = true
+  mostrarBotao('Enviando…', { travado: true })
+  try {
+    const resposta = await fetch('/api/transferencias', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Idempotency-Key': chave },
+      body: JSON.stringify(pix),
+    })
+    if (resposta.ok) chave = crypto.randomUUID() // o próximo Pix é outra intenção
+  } finally {
+    enviando = false
+    mostrarBotao('Transferir')
+  }
+}</code></pre>
+
+  <h2><span class="num">14.4</span> Na API: reservar a chave antes de mandar o dinheiro</h2>
+  <p>A API guarda cada chave numa tabela, com um resumo (hash) do Pix e a validade. A chave é reservada antes de o dinheiro sair: se dois cliques chegam juntos, só um consegue reservar, e o outro não envia nada. Uma chave expirada vale como nova. Quando o Pix sai, o <code>enviarPix</code> marca a chave como concluída, com o id da transferência.</p>
+<pre id="t14-codigo-2" data-fonte="04-apps/api/src/rotas/transferencias.ts" data-lado="API · Servidor"><code class="language-javascript">const hash = sha256(JSON.stringify(pix))
+const [reservada] = await sql(
+  `INSERT INTO chaves_de_idempotencia (chave, hash_do_corpo, expira_em)
+   VALUES ($1, $2, $3)
+   ON CONFLICT (chave) DO UPDATE SET hash_do_corpo = $2, expira_em = $3
+     WHERE chaves_de_idempotencia.expira_em &lt; $4       -- expirada: vale como nova
+   RETURNING chave`,
+  [chave, hash, new Date(Date.now() + 30_000), new Date()],
+)
+if (reservada) return res.status(201).json(await enviarPix(pix, chave))
+const usada = await buscarChave(chave)
+if (usada.hash !== hash) {                       // mesma chave, outro Pix
+  return res.status(422).json(erro('IDEMPOTENCY_KEY_REUSED'))
+}
+if (usada.status === 'processando') {            // o primeiro ainda não terminou
+  return res.status(409).json(erro('IDEMPOTENCY_KEY_IN_PROGRESS'))
+}
+res.set('Idempotent-Replayed', 'true')
+res.json({ id: usada.transferenciaId })        // o mesmo Pix, nenhum novo</code></pre>
+  <p>Cada volta da mesma chave tem a sua resposta. Se o Pix é o mesmo e já terminou, a API devolve a mesma resposta, sem Pix novo. Se o primeiro ainda está processando, ela avisa com <code>409</code> em vez de enviar de novo. E a mesma chave com outro Pix é erro, <code>422</code>: devolver o Pix antigo enganaria a pessoa.</p>
+
+  <h2><span class="num">14.5</span> Cuidados</h2>
+  <p>O botão travado não basta sozinho: ele não protege contra retries, duas abas ou alguém chamando a API direto. Quem garante é a API. Existe uma proposta de padrão na IETF para o header <code>Idempotency-Key</code>, e serviços de pagamento como o Stripe já o usam assim.</p>
+  <p>A chave tem validade: na lojinha, 30 segundos, para dar tempo de ver na aula (depois disso, “Repetir o último envio” cria outro Pix); na vida real, mais que o maior retry, umas 24 horas. Ela também não pega quem repete o Pix sem perceber, que para a API é uma intenção nova: para isso, a versão Pix duplicado bloqueia a mesma pessoa e o mesmo valor por 15 segundos, com <code>409</code> e <code>Retry-After</code>.</p>
+  <p>Clique repetido de propósito, mil vezes por segundo, já não é distração: é abuso, e a API precisa de um limite (tema 15, <a class="ref" href="#t15">Rate limiting</a>).</p>
+
+  <h2><span class="num">14.6</span> No seu projeto</h2>
+  <p>Com a rede em Slow 4G, clique três vezes rápido no botão que cria algo no seu sistema, como um pedido, um cadastro ou um comentário. Quantos registros apareceram no banco?</p>
+</section>
+
+<!-- Tema 15 -->
+<section class="texto tema" id="t15" data-tema="15" data-bloco="3" data-etiqueta="API" data-nome="Rate limiting" data-cab="Tema 15 · Rate limiting">
+  <div class="abertura">
+    <div class="capitulo">Tema 15 · API</div>
+    <h1>Rate limiting</h1>
+  </div>
+  <p>Rate limiting é limitar quantas requisições um cliente pode fazer num intervalo de tempo. Protege a API de abuso e de excesso, e quem passa do limite recebe um status próprio, o <code>429 Too Many Requests</code>.</p>
+
+  <h2><span class="num">15.1</span> O problema</h2>
+  <div class="nota" id="t15-versoes" data-fonte="04-apps/web/src/temas.ts 04-apps/web/src/temas/rate-limiting/CampoDeCupom.tsx 04-apps/web/src/temas/rate-limiting/ComRetryAfter.tsx 04-apps/web/src/temas/rate-limiting/LimiteSemExplicacao.tsx 04-apps/web/src/temas/rate-limiting/SemLimite.tsx 04-apps/web/src/temas/rate-limiting/cupons.ts 04-apps/api/src/rotas/cupons.ts"><em>Na lojinha,</em> o tema tem três versões: Sem limite, 429 sem explicação e Com Retry-After. O limite é de 5 tentativas a cada 10 s.</div>
+  <p>A lojinha tem um campo de cupom. Sem limite, um script testa mil códigos por segundo até achar um que funcione. Com limite, mas sem explicação, a API bloqueia e o front mostra “Algo deu errado”; a pessoa de verdade, que só errou a digitação algumas vezes, não sabe se o cupom é inválido, se a loja caiu ou quando pode tentar de novo.</p>
+  <figure id="t15-figura-1" data-fonte="04-apps/web/src/temas/rate-limiting/CampoDeCupom.tsx 04-apps/web/src/temas/rate-limiting/ComRetryAfter.tsx 04-apps/web/src/temas/rate-limiting/LimiteSemExplicacao.tsx 04-apps/web/src/temas/rate-limiting/SemLimite.tsx 04-apps/web/src/temas/rate-limiting/cupons.ts 04-apps/api/src/rotas/cupons.ts">
+    <div data-fig="t15"></div>
+    <figcaption>Figura 15.1. A mesma sexta tentativa em dez segundos. Com o Retry-After, a tela sabe quanto falta.</figcaption>
+  </figure>
+
+  <h2><span class="num">15.2</span> Por que acontece</h2>
+  <p>Sem limite, qualquer rota que faz algo caro ou sensível, como login, cupom ou envio de SMS, vira alvo. Com o limite mal comunicado, quem paga é o usuário legítimo: a API sabe exatamente quando ele poderá tentar de novo, mas não conta.</p>
+
+  <h2><span class="num">15.3</span> Na API: contar e responder 429 com Retry-After</h2>
+  <p>O rate limiter conta as requisições de cada cliente numa janela de tempo. Passou do máximo, responde <code>429</code> e diz no header <code>Retry-After</code> quantos segundos faltam para a janela zerar.</p>
+<pre id="t15-codigo-1" data-fonte="04-apps/api/src/rotas/cupons.ts" data-lado="API · Servidor"><code class="language-javascript">const MAXIMO = 5, JANELA = 10_000
+const contagens = new Map()                      // ip -&gt; { quantidade, zeraEm }
+
+function limitar(req, res, next) {
+  const agora = Date.now()
+  let c = contagens.get(req.ip)
+  if (!c || agora &gt;= c.zeraEm) {
+    c = { quantidade: 0, zeraEm: agora + JANELA }
+    contagens.set(req.ip, c)
+  }
+
+  if (++c.quantidade &gt; MAXIMO) {
+    const segundos = Math.ceil((c.zeraEm - agora) / 1000)
+    res.set('Retry-After', String(segundos))
+    const erro = `Muitas tentativas. Tente novamente em ${segundos} segundos.`
+    return res.status(429).json({ erro })
+  }
+  next()
+}
+
+app.post('/api/cupons/com-limite', limitar, validarCupom)</code></pre>
+  <p>No front, o <code>429</code> vira uma espera visível: o botão fica travado com “Aguarde 7s”, contando para baixo, até o tempo do <code>Retry-After</code> acabar.</p>
+
+  <h2><span class="num">15.4</span> Cuidados</h2>
+  <p>Contar em memória só funciona com um servidor; com vários, a contagem precisa ficar num lugar comum, como o Redis. Limitar por IP também pega muita gente junta: uma faculdade inteira pode sair para a internet pelo mesmo IP. Quando houver login, limite por usuário. Os headers <code>RateLimit-Limit</code> e <code>RateLimit-Remaining</code>, em padronização na IETF, permitem ao front mostrar quantas tentativas restam antes do bloqueio.</p>
+  <p>Outro bloqueio que a API devolve no meio do uso é o da sessão que expirou, e ele também não pode custar o trabalho da pessoa (tema 16, <a class="ref" href="#t16">Sessão expirada</a>).</p>
+
+  <h2><span class="num">15.5</span> No seu projeto</h2>
+  <p>Mande 50 requisições seguidas para o login da sua API, com um loop no terminal. Em que momento ela para de aceitar? A resposta diz quando tentar de novo?</p>
+</section>
+
+<!-- Tema 16 -->
+<section class="texto tema" id="t16" data-tema="16" data-bloco="3" data-etiqueta="Frontend + API" data-nome="Sessão expirada" data-cab="Tema 16 · Sessão expirada">
+  <div class="abertura">
+    <div class="capitulo">Tema 16 · Frontend + API</div>
+    <h1>Sessão expirada</h1>
+  </div>
+  <p>Sessões expiram por segurança. O problema é quando isso acontece no meio de um formulário longo: a API recusa o envio com <code>401</code>, e se o front reage mandando para a tela de login, tudo o que foi digitado se perde.</p>
+
+  <h2><span class="num">16.1</span> O problema</h2>
+  <div class="nota" id="t16-versoes" data-fonte="04-apps/web/src/temas.ts 04-apps/web/src/temas/sessao-expirada/ComModalDeLogin.tsx 04-apps/web/src/temas/sessao-expirada/FormularioDeLogin.tsx 04-apps/web/src/temas/sessao-expirada/FormularioLongo.tsx 04-apps/web/src/temas/sessao-expirada/PerdeOFormulario.tsx 04-apps/web/src/temas/sessao-expirada/sessao.ts 04-apps/api/src/rotas/sessao.ts"><em>Na lojinha,</em> o tema tem duas versões: Perde o formulário e Modal de login. O botão “Expirar sessão agora” fica no monitor.</div>
+  <p>Na lojinha, um cadastro longo pede nome, e-mail, telefone, CPF, endereço completo e um texto sobre a loja da pessoa. Ela preenche tudo, sai para pegar um café e volta. A sessão expirou nesse meio-tempo. Ela clica em Salvar cadastro, é levada para o login, entra e volta para um formulário vazio.</p>
+  <figure id="t16-figura-1" data-fonte="04-apps/web/src/temas/sessao-expirada/ComModalDeLogin.tsx 04-apps/web/src/temas/sessao-expirada/FormularioDeLogin.tsx 04-apps/web/src/temas/sessao-expirada/FormularioLongo.tsx 04-apps/web/src/temas/sessao-expirada/PerdeOFormulario.tsx 04-apps/web/src/temas/sessao-expirada/sessao.ts 04-apps/api/src/rotas/sessao.ts">
+    <div data-fig="t16"></div>
+    <figcaption>Figura 16.1. O mesmo Salvar cadastro com a sessão expirada. O modal pede o login por cima, e o formulário continua embaixo, preenchido.</figcaption>
+  </figure>
+
+  <h2><span class="num">16.2</span> Por que acontece</h2>
+  <p>A API fez a parte dela: respondeu <code>401</code>, que quer dizer “não sei quem você é”. Quem perdeu os dados foi o front, que tratou o <code>401</code> como fim de linha e trocou de página. Redirecionar desmonta a tela, e o estado em memória vai junto.</p>
+
+  <h2><span class="num">16.3</span> Na API: 401 claro</h2>
+  <p>Sessão ausente ou expirada é <code>401</code>, com uma mensagem que diga isso; <code>403</code> é para quem está logado mas não tem permissão. A diferença importa porque o front reage de jeitos diferentes: <code>401</code> pede um novo login, <code>403</code> não. O token da sessão vai num cookie <code>httpOnly</code>, que o JavaScript da página não consegue ler.</p>
+
+  <h2><span class="num">16.4</span> No front: pedir login por cima e reenviar</h2>
+  <p>Ao receber <code>401</code>, o front guarda o que ia ser enviado e abre o login num modal, por cima do formulário. Depois do login, refaz o envio sozinho, sem a pessoa clicar em Salvar cadastro de novo.</p>
+<pre id="t16-codigo-1" data-fonte="04-apps/web/src/temas/sessao-expirada/ComModalDeLogin.tsx 04-apps/web/src/temas/sessao-expirada/sessao.ts" data-lado="Frontend · Navegador"><code class="language-javascript">let pendente
+
+async function salvar(cadastro) {
+  const resposta = await fetch('/api/cadastros', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(cadastro),
+  })
+
+  if (resposta.status === 401) {
+    pendente = cadastro                           // guarda o que ia ser enviado
+    abrirModalDeLogin()                           // o formulário continua na tela
+    return
+  }
+  mostrarSucesso(await resposta.json())
+}
+
+async function aoEntrar() {
+  fecharModalDeLogin()
+  if (pendente) await salvar(pendente)            // refaz o envio que tinha falhado
+}</code></pre>
+
+  <h2><span class="num">16.5</span> Cuidados</h2>
+  <p>O modal salva o caso em que a página continua aberta. Para sobreviver a um F5 ou a uma aba fechada, o rascunho precisa ir para o <code>localStorage</code> enquanto a pessoa digita, com cuidado para não guardar dado sensível. Muitos sistemas também renovam a sessão sozinhos, com um <i>refresh token</i>, e só pedem login quando ele também expirou.</p>
+  <p>Guardar o que a pessoa fez para enviar depois é o mesmo recurso que salva a ação quando a conexão cai (tema 17, <a class="ref" href="#t17">Offline e conexão instável</a>).</p>
+
+  <h2><span class="num">16.6</span> No seu projeto</h2>
+  <p>Preencha um formulário, apague o cookie de sessão no DevTools (Application, Cookies) e envie. O que acontece com o que você digitou?</p>
+</section>
+
+<!-- Tema 17 -->
+<section class="texto tema" id="t17" data-tema="17" data-bloco="3" data-etiqueta="Frontend + API" data-nome="Offline e conexão instável" data-cab="Tema 17 · Offline">
+  <div class="abertura">
+    <div class="capitulo">Tema 17 · Frontend + API</div>
+    <h1>Offline e conexão instável</h1>
+  </div>
+  <p>A conexão cai no metrô, no elevador, no Wi-Fi da faculdade. Uma tela preparada avisa que está sem conexão, guarda o que a pessoa fez e envia sozinha quando a rede volta, em vez de mostrar “Algo deu errado” e esquecer a ação.</p>
+
+  <h2><span class="num">17.1</span> O problema</h2>
+  <div class="nota" id="t17-versoes" data-fonte="04-apps/web/src/temas.ts 04-apps/web/src/temas/offline/FilaOffline.tsx 04-apps/web/src/temas/offline/GradeDeFavoritos.tsx 04-apps/web/src/temas/offline/PerdeAAcao.tsx 04-apps/api/src/rotas/favoritos.ts"><em>Na lojinha,</em> o tema tem duas versões: Perde a ação e Fila offline. Use “Conexão da lojinha: Offline” no monitor.</div>
+  <p>No metrô, a pessoa abre a lojinha e favorita três livros para ver depois. Na versão ruim, cada clique mostra “Algo deu errado” e o coração não fica marcado. Ela tenta de novo, recebe o mesmo erro e desiste. Quando chega em casa, os favoritos não estão lá.</p>
+  <figure id="t17-figura-1" data-fonte="04-apps/web/src/temas/offline/FilaOffline.tsx 04-apps/web/src/temas/offline/GradeDeFavoritos.tsx 04-apps/web/src/temas/offline/PerdeAAcao.tsx 04-apps/api/src/rotas/favoritos.ts">
+    <div data-fig="t17"></div>
+    <figcaption>Figura 17.1. Sem conexão, a versão boa avisa, marca na hora e guarda as ações. Quando a rede volta, a fila é enviada.</figcaption>
+  </figure>
+
+  <h2><span class="num">17.2</span> Por que acontece</h2>
+  <p>Sem rede, o <code>fetch</code> falha com um <code>TypeError</code>, e a ação existia só dentro da chamada que falhou. Não há aviso de que a conexão caiu, então a pessoa não sabe se o problema é dela ou da loja. O navegador até avisa: <code>navigator.onLine</code> diz o estado atual, e os eventos <code>offline</code> e <code>online</code> disparam quando ele muda.</p>
+
+  <h2><span class="num">17.3</span> No front: avisar, enfileirar e enviar quando voltar</h2>
+  <p>Com ou sem conexão, o caminho é o mesmo: a tela muda na hora, como no Optimistic UI, e a ação entra numa fila guardada no <code>localStorage</code>, que sobrevive até a aba fechada. A fila é enviada em ordem, e cada ação só sai dela depois que a API confirma. As funções <code>lerFila</code> e <code>salvarFila</code> só leem e gravam essa lista.</p>
+<pre id="t17-codigo-1" data-fonte="04-apps/web/src/temas/offline/FilaOffline.tsx" data-lado="Frontend · Navegador"><code class="language-javascript">function alternarFavorito(produtoId, favoritar) {
+  marcarNaTela(produtoId, favoritar)
+  salvarFila([...lerFila(), { produtoId, favoritar }])
+  enviarFila()
+}
+
+async function enviarFila() {
+  for (let fila = lerFila(); fila.length &gt; 0 &amp;&amp; navigator.onLine; fila = lerFila()) {
+    const [{ produtoId, favoritar }] = fila
+    const method = favoritar ? 'PUT' : 'DELETE'
+    const r = await fetch(`/api/favoritos/${produtoId}`, { method }).catch(() =&gt; null)
+    if (!r?.ok) return                           // sem rede ou com erro: o resto espera
+    salvarFila(lerFila().slice(1))               // só sai da fila com a API confirmando
+  }
+}
+
+window.addEventListener('online', enviarFila)
+window.addEventListener('offline', () =&gt; mostrarAviso('Você está sem conexão'))</code></pre>
+
+  <h2><span class="num">17.4</span> Na API: aguentar a repetição</h2>
+  <p>A conexão pode cair depois de a API gravar e antes de a resposta chegar. Nesse caso, a ação continua na fila e vai de novo. Isso só é seguro porque favoritar é <code>PUT</code> e desfavoritar é <code>DELETE</code>, que são idempotentes: chegar duas vezes dá no mesmo. Para uma ação que cria algo, como um <code>POST</code>, a fila precisaria mandar uma chave de idempotência (tema 14, <a class="ref" href="#t14">Clique duplo e idempotência</a>).</p>
+
+  <h2><span class="num">17.5</span> Cuidados</h2>
+  <p><code>navigator.onLine</code> verdadeiro só garante que existe uma rede, não que a API responde; por isso a ação vai para a fila mesmo quando parece haver conexão. Uma ação enfileirada também pode ficar velha, como favoritar um produto que saiu da loja: a API deve responder algo que o front saiba tratar, e o front tira a ação da fila e avisa. E nem tudo deve esperar a rede voltar; um pagamento não.</p>
+  <p>Do lado da leitura, mostrar o que já se tem enquanto a rede não responde é o assunto do próximo bloco (tema 18, <a class="ref" href="#t18">Caching</a>).</p>
+
+  <h2><span class="num">17.6</span> No seu projeto</h2>
+  <p>Coloque o DevTools em Offline, faça uma ação no seu sistema e volte para Online. A ação chegou à API? E se você fechar a aba enquanto estiver offline?</p>
+</section>
+
+<!-- ================= BLOCO 4 ================= -->
+<section class="divisor" id="b4" data-bloco="4">
+  <div class="conteudo">
+    <div class="rotulo">Bloco 4</div>
+    <h1>Rapidez de verdade</h1>
+    <p>Ficar rápido quase nunca é trocar de servidor. É não buscar de novo o que já se tem, não baixar o que ninguém vai ver e fazer a API entregar exatamente o que a tela precisa.</p>
+    <ol></ol>
+  </div>
+</section>
+
+<!-- Tema 18 -->
+<section class="texto tema" id="t18" data-tema="18" data-bloco="4" data-etiqueta="Frontend + API" data-nome="Caching" data-cab="Tema 18 · Caching">
+  <div class="abertura">
+    <div class="capitulo">Tema 18 · Frontend + API</div>
+    <h1>Caching</h1>
+  </div>
+  <p>Cache é guardar uma resposta para não buscar de novo o que acabou de chegar. Pode morar no front, em memória ou numa biblioteca como o TanStack Query, no navegador, pelo cache HTTP que a API controla com headers, ou nos dois. O cuidado é não mostrar um dado velho como se fosse atual.</p>
+
+  <h2><span class="num">18.1</span> O problema</h2>
+  <div class="nota" id="t18-versoes" data-fonte="04-apps/web/src/temas.ts 04-apps/web/src/temas/cache/CacheHttp.tsx 04-apps/web/src/temas/cache/CacheNaMao.tsx 04-apps/web/src/temas/cache/ComTanstackQuery.tsx 04-apps/web/src/temas/cache/SemCache.tsx 04-apps/api/src/rotas/cache-http.ts"><em>Na lojinha,</em> o tema tem quatro versões: Sem cache, Cache na mão, TanStack Query e Cache HTTP.</div>
+  <p>Na lojinha, a pessoa olha Eletrônicos, passa para Livros e volta para Eletrônicos. Sem cache, a lista some e carrega tudo de novo, embora ela tenha visto a mesma lista três segundos antes. Em rede lenta, cada troca de categoria é uma espera.</p>
+  <figure id="t18-figura-1" data-fonte="04-apps/web/src/temas/cache/CacheHttp.tsx 04-apps/web/src/temas/cache/CacheNaMao.tsx 04-apps/web/src/temas/cache/ComTanstackQuery.tsx 04-apps/web/src/temas/cache/SemCache.tsx 04-apps/api/src/rotas/cache-http.ts">
+    <div data-fig="t18"></div>
+    <figcaption>Figura 18.1. Ida e volta entre duas categorias. Com cache, a volta a Eletrônicos aparece na hora, e a versão nova chega por trás.</figcaption>
+  </figure>
+
+  <h2><span class="num">18.2</span> Por que acontece</h2>
+  <p>Quando cada tela busca seus dados ao aparecer e descarta tudo ao sair, a resposta anterior vai embora junto. A volta é tratada como a primeira visita.</p>
+
+  <h2><span class="num">18.3</span> No front: mostrar o que tem e atualizar por trás</h2>
+  <p>A ideia tem nome, <i>stale-while-revalidate</i>: mostrar na hora o que está guardado, mesmo que um pouco velho, e buscar a versão nova em background. No TanStack Query, isso vem pronto com a <code>queryKey</code>, e o <code>staleTime</code> diz por quanto tempo o dado nem precisa ser buscado de novo.</p>
+<pre id="t18-codigo-1" data-fonte="04-apps/web/src/temas/cache/CacheNaMao.tsx" data-lado="Frontend · Navegador"><code class="language-javascript">const cache = new Map()            // fora da tela: sobrevive à troca de categoria
+
+async function mostrarCategoria(categoria) {
+  const guardados = cache.get(categoria)
+  if (guardados) mostrarProdutos(guardados)         // 1. na hora, o que já tem
+
+  const novos = await buscarProdutos(categoria)     // 2. a versão nova, por trás
+  cache.set(categoria, novos)
+  if (categoria === categoriaAtual) mostrarProdutos(novos)
+}</code></pre>
+
+  <h2><span class="num">18.4</span> Na API: cache HTTP</h2>
+  <p>A API pode dizer ao navegador como guardar a resposta. <code>Cache-Control: max-age=10</code> faz o navegador usar a cópia dele por dez segundos sem nem perguntar. Depois disso, ele pergunta se mudou, mandando a <code>ETag</code> que guardou; se não mudou, a resposta é <code>304</code>, sem corpo.</p>
+<pre id="t18-codigo-2" data-fonte="04-apps/api/src/rotas/cache-http.ts" data-lado="API · Servidor"><code class="language-javascript">app.get('/api/produtos-com-cache', async (req, res) =&gt; {
+  const corpo = JSON.stringify(await listarProdutos(req.query.categoria))
+
+  res.set('Cache-Control', 'max-age=10')              // 10 s sem nem perguntar
+  res.set('ETag', `"${hash(corpo)}"`)                 // depois, pergunta: mudou?
+  if (req.fresh) return res.status(304).end()         // não mudou: 304, sem corpo
+
+  res.type('json').send(corpo)
+})</code></pre>
+
+  <h2><span class="num">18.5</span> Cuidados</h2>
+  <p>Dado que muda a todo instante ou que é pessoal, como saldo e carrinho, pede <code>max-age</code> curto, <code>private</code> ou <code>no-store</code>. Depois de uma escrita, o cache do que mudou precisa ser descartado: cadastrou um produto, a lista guardada ficou velha. E o cache do navegador não pode ser apagado pelo servidor; um <code>max-age</code> longo num dado que muda é um erro difícil de desfazer.</p>
+  <p>Imagens são o caso em que o cache mais pesa, e um detalhe das signed URLs costuma anulá-lo (tema 19, <a class="ref" href="#t19">Imagens com signed URL e cache</a>).</p>
+
+  <h2><span class="num">18.6</span> No seu projeto</h2>
+  <p>Com a aba Network aberta, vá de uma tela para outra e volte. A lista foi baixada de novo? Veja também se as respostas da sua API têm <code>Cache-Control</code> e <code>ETag</code>.</p>
+</section>
+
+<!-- Tema 19 -->
+<section class="texto tema" id="t19" data-tema="19" data-bloco="4" data-etiqueta="Frontend + API" data-nome="Imagens com signed URL e cache" data-cab="Tema 19 · Signed URL">
+  <div class="abertura">
+    <div class="capitulo">Tema 19 · Frontend + API</div>
+    <h1>Imagens com signed URL e cache</h1>
+  </div>
+  <p>Signed URL é um link temporário para um arquivo privado guardado num storage como o S3 ou o MinIO: a assinatura e a validade vão na própria URL. Bem usada, protege as imagens sem impedir o cache; mal usada, faz o navegador baixar todas as fotos de novo a cada visita.</p>
+
+  <h2><span class="num">19.1</span> O problema</h2>
+  <div class="nota" id="t19-versoes" data-fonte="04-apps/web/src/temas.ts 04-apps/web/src/temas/signed-url/UrlNovaACadaVez.tsx 04-apps/web/src/temas/signed-url/UrlReaproveitada.tsx 04-apps/web/src/temas/signed-url/Vitrine.tsx 04-apps/api/src/rotas/signed-url.ts"><em>Na lojinha,</em> o tema tem duas versões: URL nova a cada vez e URL reaproveitada. Clique em “Esquecer URLs assinadas” no monitor e troque de versão.</div>
+  <p>A vitrine da lojinha mostra doze produtos com foto. Na versão ruim, a cada F5 as doze fotos são baixadas de novo, embora o arquivo seja o mesmo. A vitrine pisca e demora toda vez, e no celular o plano de dados paga por imagens que o navegador já tinha.</p>
+  <figure id="t19-figura-1" data-fonte="04-apps/web/src/temas/signed-url/UrlNovaACadaVez.tsx 04-apps/web/src/temas/signed-url/UrlReaproveitada.tsx 04-apps/web/src/temas/signed-url/Vitrine.tsx 04-apps/api/src/rotas/signed-url.ts">
+    <div data-fig="t19"></div>
+    <figcaption>Figura 19.1. Três acessos à vitrine. Com a URL reaproveitada, o F5 usa as fotos que o navegador já tem.</figcaption>
+  </figure>
+
+  <h2><span class="num">19.2</span> Por que acontece</h2>
+  <p>Para o navegador, URL diferente é arquivo diferente. A signed URL leva a data em que foi assinada e a assinatura na query string, e se a API assina na hora a cada requisição, cada F5 traz URLs novas para as mesmas fotos:</p>
+<pre id="t19-codigo-1" data-fonte="04-apps/web/src/temas/signed-url/UrlNovaACadaVez.tsx" data-lado="Na rede"><code class="language-plaintext">/fotos/5.jpg?X-Amz-Date=20261018T100215Z&amp;X-Amz-Expires=3600&amp;X-Amz-Signature=9f2c…
+/fotos/5.jpg?X-Amz-Date=20261018T100348Z&amp;X-Amz-Expires=3600&amp;X-Amz-Signature=41ab…</code></pre>
+
+  <h2><span class="num">19.3</span> Na API: a mesma URL durante um período</h2>
+  <p>Em vez de assinar com a hora exata, a API assina como se fosse o começo de um período de uma hora. Durante o período inteiro, a URL de cada foto é idêntica, e o navegador usa a que já tem. A validade cobre o começo do período mais uma hora de folga, para nunca expirar enquanto a foto estiver no cache. Na vida real, o período costuma ser a hora cheia; na lojinha, ele começa quando a API sobe, e o botão “Esquecer URLs assinadas” recomeça, para mostrar de novo o primeiro download na aula.</p>
+<pre id="t19-codigo-2" data-fonte="04-apps/api/src/rotas/signed-url.ts" data-lado="API · Servidor"><code class="language-javascript">const UMA_HORA = 60 * 60 * 1000
+let comecoDoPeriodo = Date.now()          // na vida real, o começo da hora cheia
+
+function periodoAtual() {
+  while (Date.now() - comecoDoPeriodo &gt;= UMA_HORA) comecoDoPeriodo += UMA_HORA
+  return new Date(comecoDoPeriodo)
+}
+
+const comando = new GetObjectCommand({ Bucket: 'fotos', Key: '5.jpg' })
+const foto = await getSignedUrl(s3, comando, {
+  signingDate: periodoAtual(),         // a mesma durante o período: a URL não muda
+  expiresIn: 2 * 60 * 60,              // vale 2 h a partir do começo do período
+})</code></pre>
+  <p>Para o navegador guardar a imagem, o arquivo também precisa de <code>Cache-Control</code>, como <code>max-age=3600</code>, definido no objeto do bucket. No front, nada muda: a tag <code>&lt;img&gt;</code> recebe a URL e o navegador faz o resto. Só não acrescente parâmetros como <code>?t=</code> com a hora atual, que anulam o cache do mesmo jeito.</p>
+
+  <h2><span class="num">19.4</span> Cuidados</h2>
+  <p>O cache nunca pode durar mais que a URL: se a assinatura expira antes, a próxima requisição da imagem falha.</p>
+  <p>Com o cache resolvido para quem volta, falta não baixar à toa, na primeira visita, o que a pessoa nem vai ver (tema 20, <a class="ref" href="#t20">Lazy loading</a>).</p>
+
+  <h2><span class="num">19.5</span> No seu projeto</h2>
+  <p>Com “Disable cache” desmarcado na aba Network, abra uma página com imagens privadas e dê F5. As imagens aparecem como vindas do cache ou baixam de novo? Compare as URLs entre dois F5.</p>
+</section>
+
+<!-- Tema 20 -->
+<section class="texto tema" id="t20" data-tema="20" data-bloco="4" data-etiqueta="Frontend" data-nome="Lazy loading" data-cab="Tema 20 · Lazy loading">
+  <div class="abertura">
+    <div class="capitulo">Tema 20 · Frontend</div>
+    <h1>Lazy loading</h1>
+  </div>
+  <p>Lazy loading é carregar uma coisa só quando ela for necessária, como a imagem que só é baixada quando está chegando perto da tela. O primeiro carregamento fica menor e chega antes.</p>
+
+  <h2><span class="num">20.1</span> O problema</h2>
+  <div class="nota" id="t20-versoes" data-fonte="04-apps/web/src/temas.ts 04-apps/web/src/temas/lazy-loading/ContadorDeDownloads.tsx 04-apps/web/src/temas/lazy-loading/SoQuandoAparece.tsx 04-apps/web/src/temas/lazy-loading/TudoDeUmaVez.tsx"><em>Na lojinha,</em> o tema tem duas versões: Tudo de uma vez e loading="lazy", com um contador de imagens e megabytes baixados no topo.</div>
+  <p>A página do tema na lojinha tem 200 imagens. Na versão ruim, ao abrir a página o navegador baixa as 200, embora só umas seis caibam na tela. Quem olha as primeiras e sai pagou por todas, e as imagens do topo disputam a conexão com as 194 que ninguém viu.</p>
+  <figure id="t20-figura-1" data-fonte="04-apps/web/src/temas/lazy-loading/ContadorDeDownloads.tsx 04-apps/web/src/temas/lazy-loading/SoQuandoAparece.tsx 04-apps/web/src/temas/lazy-loading/TudoDeUmaVez.tsx">
+    <div data-fig="t20"></div>
+    <figcaption>Figura 20.1. A mesma página logo depois de abrir, sem rolar. O contador mostra quantas imagens já foram baixadas.</figcaption>
+  </figure>
+
+  <h2><span class="num">20.2</span> Por que acontece</h2>
+  <p>Por padrão, uma <code>&lt;img&gt;</code> é baixada assim que o navegador lê o HTML, esteja ela no topo ou no fim da página.</p>
+
+  <h2><span class="num">20.3</span> No front: só quando aparecer</h2>
+  <p>Para imagens, o atributo <code>loading="lazy"</code> resolve sem nenhum JavaScript: o navegador só baixa quando a imagem está chegando perto da área visível.</p>
+<pre id="t20-codigo-1" data-fonte="04-apps/web/src/temas/lazy-loading/SoQuandoAparece.tsx" data-lado="Frontend · HTML"><code class="language-html">&lt;img src="/api/imagens/28" alt="Garrafa térmica" loading="lazy" width="640" height="480"&gt;</code></pre>
+
+  <h2><span class="num">20.4</span> Cuidados</h2>
+  <p><code>width</code> e <code>height</code> são obrigatórios: sem eles, todas as imagens começam com altura zero, cabem juntas na tela e o navegador baixa todas (tema 6, <a class="ref" href="#t6">Layout shift</a>). Não use lazy na imagem principal do topo, que é a primeira coisa que a pessoa vê; atrasá-la piora justamente o que mais importa. E “perto da tela” é generoso: o Chrome começa a baixar mais de mil pixels antes, para a imagem já estar lá quando a rolagem chegar.</p>
+  <p>Baixar menos também vale para dados. Às vezes o problema não é o tamanho, mas quantas requisições a tela faz para se montar (tema 21, <a class="ref" href="#t21">N+1 requests</a>).</p>
+
+  <h2><span class="num">20.5</span> No seu projeto</h2>
+  <p>Na aba Network, filtre por Img e abra a página sem rolar. Quantas imagens foram baixadas? Quantas estão visíveis?</p>
+</section>
+
+<!-- Tema 21 -->
+<section class="texto tema" id="t21" data-tema="21" data-bloco="4" data-etiqueta="API" data-nome="N+1 requests" data-cab="Tema 21 · N+1 requests">
+  <div class="abertura">
+    <div class="capitulo">Tema 21 · API</div>
+    <h1>N+1 requests</h1>
+  </div>
+  <p>N+1 é quando montar uma tela exige uma requisição para o item principal e mais uma para cada item relacionado: uma para o produto, N para os comentários. O nome vem do banco de dados, onde o mesmo padrão aparece nas consultas.</p>
+
+  <h2><span class="num">21.1</span> O problema</h2>
+  <div class="nota" id="t21-versoes" data-fonte="04-apps/web/src/temas.ts 04-apps/web/src/temas/n-mais-1/TelaDoProduto.tsx 04-apps/web/src/temas/n-mais-1/UmEndpoint.tsx 04-apps/web/src/temas/n-mais-1/VariasRequisicoes.tsx 04-apps/api/src/rotas/n-mais-1.ts"><em>Na lojinha,</em> o tema tem duas versões: Um endpoint por recurso e Um endpoint por tela. No monitor, 15 requisições contra 1.</div>
+  <p>A página do Monitor 24 polegadas mostra o produto, o vendedor e doze comentários. Na versão ruim, a API tem um endpoint para cada coisa e a tela junta as peças: uma requisição para o produto, uma para o vendedor, uma para a lista de comentários e uma para cada comentário. São 15 requisições, em três ondas, porque o vendedor só pode ser pedido depois de se saber quem ele é.</p>
+  <figure id="t21-figura-1" data-fonte="04-apps/web/src/temas/n-mais-1/TelaDoProduto.tsx 04-apps/web/src/temas/n-mais-1/UmEndpoint.tsx 04-apps/web/src/temas/n-mais-1/VariasRequisicoes.tsx 04-apps/api/src/rotas/n-mais-1.ts">
+    <div data-fig="t21"></div>
+    <figcaption>Figura 21.1. A mesma página do produto. Em cima, três ondas de requisições, e os comentários ainda em três levas; embaixo, uma resposta com tudo.</figcaption>
+  </figure>
+
+  <h2><span class="num">21.2</span> Por que acontece</h2>
+  <p>A API foi desenhada pensando nas tabelas, um recurso por endpoint, e não nas telas que vão usá-la. Cada requisição paga a latência inteira da rede, e as que dependem de outra esperam em fila. No HTTP/1.1, o navegador ainda abre no máximo seis conexões por servidor, somando todas as abas. Na aula, duas delas ficam ocupadas pelo monitor, e os doze comentários saem em três levas de quatro.</p>
+
+  <h2><span class="num">21.3</span> Na API: um endpoint que entrega o que a tela precisa</h2>
+  <p>Um endpoint por tela devolve tudo numa resposta. Dentro dele, o cuidado é o mesmo no banco: um <code>JOIN</code> traz produto e vendedor juntos, e uma consulta só traz todos os comentários. Fazer um <code>SELECT</code> por comentário dentro da API só mudaria o N+1 de lugar.</p>
+<pre id="t21-codigo-1" data-fonte="04-apps/api/src/rotas/n-mais-1.ts" data-lado="API · Servidor"><code class="language-javascript">// GET /api/telas/produto/7 - a página inteira numa resposta
+app.get('/api/telas/produto/:id', async (req, res) =&gt; {
+  const [produto] = await sql(
+    `SELECT p.id, p.nome, p.preco_centavos,
+            json_build_object('nome', v.nome, 'cidade', v.cidade) AS vendedor
+     FROM produtos p JOIN vendedores v ON v.id = p.vendedor_id
+     WHERE p.id = $1`,
+    [req.params.id],
+  )
+  const comentarios = await sql(
+    'SELECT autor, texto, nota FROM comentarios WHERE produto_id = $1',
+    [req.params.id],
+  )
+  res.json({ ...produto, comentarios })
+})</code></pre>
+
+  <h2><span class="num">21.4</span> Cuidados</h2>
+  <p>Endpoint por tela acopla a API à tela: mudou a tela, muda a API. Padrões como o BFF (Backend for Frontend) e ferramentas como o GraphQL são formas organizadas de lidar com isso. E entregar o que a tela precisa também quer dizer não entregar demais: se o produto tivesse dez mil comentários, eles viriam aos pedaços (tema 22, <a class="ref" href="#t22">Paginação e infinite scroll</a>).</p>
+
+  <h2><span class="num">21.5</span> No seu projeto</h2>
+  <p>Abra a tela mais importante do seu sistema com a aba Network aberta. Quantas requisições ela faz até ficar pronta? Quantas esperam outra terminar?</p>
+</section>
+
+<!-- Tema 22 -->
+<section class="texto tema" id="t22" data-tema="22" data-bloco="4" data-etiqueta="Frontend + API" data-nome="Paginação e infinite scroll" data-cab="Tema 22 · Paginação">
+  <div class="abertura">
+    <div class="capitulo">Tema 22 · Frontend + API</div>
+    <h1>Paginação e infinite scroll</h1>
+  </div>
+  <p>Paginar é entregar uma lista em pedaços. Páginas numeradas e infinite scroll são dois jeitos de mostrar esses pedaços na tela; offset e cursor são dois jeitos de a API saber qual pedaço mandar.</p>
+
+  <h2><span class="num">22.1</span> O problema</h2>
+  <div class="nota" id="t22-versoes" data-fonte="04-apps/web/src/temas.ts 04-apps/web/src/temas/paginacao/InfinitoComCursor.tsx 04-apps/web/src/temas/paginacao/InfinitoComOffset.tsx 04-apps/web/src/temas/paginacao/ListaDoFeed.tsx 04-apps/web/src/temas/paginacao/PaginasNumeradas.tsx 04-apps/web/src/temas/paginacao/SemPaginacao.tsx 04-apps/web/src/temas/paginacao/feed.ts 04-apps/api/src/rotas/paginacao.ts"><em>Na lojinha,</em> o tema tem quatro versões: Sem paginação, Páginas numeradas, Infinito com offset e Infinito com cursor. O botão “Simular: alguém publicou agora” insere uma publicação no topo.</div>
+  <p>O feed da lojinha tem 5.000 publicações. Sem paginação, a API manda todas de uma vez: a resposta é grande, o banco lê tudo, a tela demora para desenhar, e a pessoa olha as dez primeiras.</p>
+  <p>Paginar resolve isso, mas cria outro problema quando a lista muda. Com infinite scroll por offset, a pessoa vê as dez primeiras publicações; enquanto ela lê, alguém publica uma nova no topo. Quando a rolagem pede a próxima página, a publicação 4991, que era a décima, virou a décima primeira, e aparece de novo.</p>
+  <figure id="t22-figura-1" data-fonte="04-apps/web/src/temas/paginacao/InfinitoComCursor.tsx 04-apps/web/src/temas/paginacao/InfinitoComOffset.tsx 04-apps/web/src/temas/paginacao/ListaDoFeed.tsx 04-apps/web/src/temas/paginacao/PaginasNumeradas.tsx 04-apps/web/src/temas/paginacao/SemPaginacao.tsx 04-apps/web/src/temas/paginacao/feed.ts 04-apps/api/src/rotas/paginacao.ts">
+    <div data-fig="t22"></div>
+    <figcaption>Figura 22.1. Entre a primeira e a segunda página, alguém publicou a 5001. Com offset, a 4991 aparece duas vezes; com cursor, a lista segue certa.</figcaption>
+  </figure>
+
+  <h2><span class="num">22.2</span> Por que acontece</h2>
+  <p>O offset conta posições: “pule as dez primeiras”. Quando um item entra ou sai, as posições mudam e a conta erra, repetindo ou pulando itens. O cursor aponta para um item: “os dez que vêm depois da 4991”. O item não muda de lugar quando outro entra. Offset grande ainda é lento, porque o banco lê e descarta todas as linhas que pulou.</p>
+
+  <h2><span class="num">22.3</span> Na API: paginar por cursor</h2>
+<pre id="t22-codigo-1" data-fonte="04-apps/api/src/rotas/paginacao.ts" data-lado="API · Servidor"><code class="language-javascript">// GET /api/feed/cursor?depoisDe=4991 - os 10 que vêm depois da publicação 4991
+app.get('/api/feed/cursor', async (req, res) =&gt; {
+  const depoisDe = req.query.depoisDe ? Number(req.query.depoisDe) : null
+
+  const itens = await sql(
+    `SELECT id, texto FROM publicacoes
+     WHERE ($1::int IS NULL OR id &lt; $1)
+     ORDER BY id DESC LIMIT 10`,
+    [depoisDe],
+  )
+  const proximoCursor = itens.length === 10 ? itens.at(-1).id : null   // null: acabou
+  res.json({ itens, proximoCursor })
+})</code></pre>
+
+  <h2><span class="num">22.4</span> No front: páginas ou infinite scroll</h2>
+  <p>Páginas numeradas servem para procurar e comparar: resultados de busca, tabelas, listas em que a pessoa quer voltar a um item ou saber quantos são. Combinam com a página na URL (tema 3, <a class="ref" href="#t3">URL como estado</a>). O infinite scroll serve para consumir sem um objetivo definido, como um feed. Ele dificulta chegar ao rodapé e voltar ao ponto onde se estava. No front, um <code>IntersectionObserver</code> avisa quando o fim da lista aparece na tela, e só então a próxima página é pedida.</p>
+<pre id="t22-codigo-2" data-fonte="04-apps/web/src/temas/paginacao/InfinitoComCursor.tsx" data-lado="Frontend · Navegador"><code class="language-javascript">const observador = new IntersectionObserver(async ([fim]) =&gt; {
+  if (!fim.isIntersecting || acabou) return
+  const resposta = await fetch(`/api/feed/cursor?depoisDe=${cursor ?? ''}`)
+  const { itens, proximoCursor } = await resposta.json()
+  adicionarNaLista(itens)
+  cursor = proximoCursor
+  acabou = proximoCursor === null
+})
+observador.observe(document.querySelector('#fim-da-lista'))</code></pre>
+
+  <h2><span class="num">22.5</span> Cuidados</h2>
+  <p>Com cursor, não dá para pular direto para a página 37; para isso, páginas numeradas com offset continuam sendo o caminho, aceitando o risco de repetição. A ordenação do cursor precisa ser única e estável, como o id, ou a data mais o id. E paginar bem fecha o que o tema 21, <a class="ref" href="#t21">N+1 requests</a>, começou: a API entrega pouco e certo, e a tela mostra rápido.</p>
+
+  <h2><span class="num">22.6</span> No seu projeto</h2>
+  <p>Procure no seu código uma consulta sem <code>LIMIT</code> que alimenta uma lista na tela. Quantas linhas ela devolve hoje? E daqui a um ano?</p>
+</section>
+
+<!-- ================= CHECKLIST ================= -->
+<section class="texto checklist" data-cab="Checklist para o seu projeto" id="checklist">
+  <div class="abertura">
+    <div class="capitulo">Para levar</div>
+    <h1>Checklist para o seu projeto</h1>
+  </div>
+  <p>Os 22 temas em forma de pergunta. Marque o que o seu projeto já faz; o que ficar sem marca tem um tema inteiro explicando o caminho.</p>
+  <h2>1. Antes do clique</h2>
+  <ol>
+    <li><span class="caixa"></span><span class="n">1</span><span>O formulário mostra o que falta antes de ir para o servidor, e nada do que foi digitado se perde num erro?</span></li>
+    <li><span class="caixa"></span><span class="n">2</span><span>Quando a API recusa um dado, ela responde com o status certo e diz qual campo está errado?</span></li>
+    <li><span class="caixa"></span><span class="n">3</span><span>Filtros, busca e página atual sobrevivem a um F5 e vão junto quando o link é copiado?</span></li>
+  </ol>
+  <h2>2. Durante a espera</h2>
+  <ol>
+    <li><span class="caixa"></span><span class="n">4</span><span>Cada tela que busca dados tem desenho próprio para carregando, erro (com “Tentar de novo”) e vazio (com orientação)?</span></li>
+    <li><span class="caixa"></span><span class="n">5</span><span>Enquanto carrega, a tela mostra o formato do que vai aparecer?</span></li>
+    <li><span class="caixa"></span><span class="n">6</span><span>Imagens, banners e avisos têm espaço reservado, para nada mudar de lugar quando chegam?</span></li>
+    <li><span class="caixa"></span><span class="n">7</span><span>Buscas e eventos em rajada, como digitação, scroll e resize, passam por debounce ou throttle?</span></li>
+    <li><span class="caixa"></span><span class="n">8</span><span>Quando a pessoa troca rápido de aba ou de filtro, a requisição anterior é cancelada ou descartada?</span></li>
+    <li><span class="caixa"></span><span class="n">9</span><span>Ações pequenas e reversíveis mudam a tela na hora e voltam com aviso se a API recusar?</span></li>
+    <li><span class="caixa"></span><span class="n">10</span><span>Toda ação tem uma confirmação visível que não trava a tela?</span></li>
+    <li><span class="caixa"></span><span class="n">11</span><span>Uploads mostram o progresso do envio e do processamento?</span></li>
+  </ol>
+  <h2>3. Quando dá errado</h2>
+  <ol>
+    <li><span class="caixa"></span><span class="n">12</span><span>Toda requisição tem um tempo máximo, e a tela explica e oferece tentar de novo quando ele estoura?</span></li>
+    <li><span class="caixa"></span><span class="n">13</span><span>Falhas passageiras são repetidas poucas vezes, com espera crescente, e só em operações seguras de repetir?</span></li>
+    <li><span class="caixa"></span><span class="n">14</span><span>Uma ação enviada duas vezes, por clique duplo, retry ou duas abas, conta uma vez só?</span></li>
+    <li><span class="caixa"></span><span class="n">15</span><span>Rotas sensíveis têm limite de requisições, e o 429 diz quando tentar de novo?</span></li>
+    <li><span class="caixa"></span><span class="n">16</span><span>Se a sessão expira no meio de um formulário, a pessoa entra de novo sem perder o que digitou?</span></li>
+    <li><span class="caixa"></span><span class="n">17</span><span>Sem conexão, a tela avisa, guarda as ações e as envia quando a rede volta?</span></li>
+  </ol>
+  <h2>4. Rapidez de verdade</h2>
+  <ol>
+    <li><span class="caixa"></span><span class="n">18</span><span>Voltar a uma tela já vista mostra os dados na hora e atualiza por trás?</span></li>
+    <li><span class="caixa"></span><span class="n">19</span><span>Imagens privadas continuam vindo do cache depois de um F5?</span></li>
+    <li><span class="caixa"></span><span class="n">20</span><span>Imagens fora da tela só são baixadas quando estão chegando perto dela?</span></li>
+    <li><span class="caixa"></span><span class="n">21</span><span>A tela principal se monta com poucas requisições, sem uma por item?</span></li>
+    <li><span class="caixa"></span><span class="n">22</span><span>Toda lista tem limite na API, e a infinite scroll não repete nem pula itens?</span></li>
+  </ol>
+</section>
+
+<!-- ================= COMO RODAR ================= -->
+<section class="texto" data-cab="Como rodar a lojinha" id="rodar">
+  <div class="abertura">
+    <div class="capitulo">Para levar</div>
+    <h1>Como rodar a lojinha</h1>
+  </div>
+  <p>A lojinha tem um front em React com Vite e Mantine, uma API em Node com Express e TypeScript, um banco Postgres e um MinIO, que faz o papel do S3 para as fotos. O banco e o MinIO rodam no Docker; o resto roda direto na sua máquina.</p>
+
+  <h2>Requisitos</h2>
+  <p>Node 22 ou mais novo, Git e o Docker Desktop aberto.</p>
+
+  <h2>Passo a passo</h2>
+<pre data-lado="Terminal"><code class="language-bash">git clone https://github.com/adriangpo/lojinha-ux
+cd lojinha-ux
+
+npm run instalar     # só na primeira vez
+npm run banco        # sobe o Postgres (porta 5433) e o MinIO (9000)
+npm run dev          # sobe a API (3333) e o front (5173)</code></pre>
+  <p>Com tudo no ar, a lojinha abre em <code>http://localhost:5173</code> e o monitor em <code>http://localhost:5173/monitor</code>. Abra os dois em abas separadas. Para zerar o banco, rode <code>docker compose down -v</code> e depois <code>npm run banco</code> de novo; as fotos voltam sozinhas quando a API sobe.</p>
+
+  <h2>Usando a lojinha e o monitor</h2>
+  <p>O menu da lojinha lista os 22 temas na ordem desta apostila. Em cada página, o seletor no canto superior direito troca entre as versões, da ruim para a boa, e o botão “Ver código” mostra o arquivo daquela versão. Ao lado fica o Console, uma versão compacta do monitor, que o botão Console mostra e esconde. Quando algum controle do monitor está ligado, a lojinha mostra um aviso no topo, com o botão Zerar, que volta tudo ao normal.</p>
+  <p>O monitor mostra o que acontece entre a pessoa, a tela, o navegador, a API e o banco, em barras no tempo ou num diagrama de sequência. Clicando numa barra, aparecem o status, os headers que importam, o body da requisição e da resposta e o SQL executado. O painel do monitor também controla a lojinha:</p>
+  <table>
+    <tr><th>Controle</th><th>Para quê</th></tr>
+    <tr><td>Latência: Nenhuma, 300 ms, 1 s, 3 s, Aleatória ou Travada</td><td>Deixar a API lenta, irregular ou parada (temas 5, 6, 9 e 12)</td></tr>
+    <tr><td>Taxa de erro: 0%, 25%, 50% ou 100%</td><td>Fazer a API responder 503 (temas 4, 9 e 13)</td></tr>
+    <tr><td>Expirar sessão agora</td><td>Derrubar a sessão no meio do formulário (tema 16, <a class="ref" href="#t16">Sessão expirada</a>)</td></tr>
+    <tr><td>Conexão da lojinha: Online ou Offline</td><td>Simular a queda da conexão nas abas da lojinha (tema 17, <a class="ref" href="#t17">Offline e conexão instável</a>)</td></tr>
+    <tr><td>Esquecer URLs assinadas</td><td>Fazer a URL reaproveitada baixar as fotos de novo uma vez (tema 19, <a class="ref" href="#t19">Imagens com signed URL e cache</a>)</td></tr>
+    <tr><td>Fixar para comparar</td><td>Guardar a linha do tempo de uma versão e rodar a outra embaixo</td></tr>
+  </table>
+  <p>Para comparar duas versões, rode a ruim, clique em Fixar para comparar e rode a boa: as duas linhas do tempo ficam uma embaixo da outra, cada uma com o seu placar de requisições.</p>
+</section>
+
+<!-- ================= REFERÊNCIAS ================= -->
+<section class="texto referencias" data-cab="Referências" id="referencias">
+  <div class="abertura">
+    <div class="capitulo">Para levar</div>
+    <h1>Referências</h1>
+  </div>
+  <ol>
+    <li>Jakob Nielsen. Response Times: The 3 Important Limits. Nielsen Norman Group, 1993.<span class="url">nngroup.com/articles/response-times-3-important-limits</span></li>
+    <li>GOV.UK Design System. Button, seção sobre botões desabilitados.<span class="url">design-system.service.gov.uk/components/button</span></li>
+    <li>RFC 9110. HTTP Semantics: métodos, idempotência, status codes e Retry-After.<span class="url">rfc-editor.org/rfc/rfc9110</span></li>
+    <li>RFC 9457. Problem Details for HTTP APIs.<span class="url">rfc-editor.org/rfc/rfc9457</span></li>
+    <li>RFC 6585. Additional HTTP Status Codes, onde está o 429.<span class="url">rfc-editor.org/rfc/rfc6585</span></li>
+    <li>RFC 9111. HTTP Caching.<span class="url">rfc-editor.org/rfc/rfc9111</span></li>
+    <li>RFC 5861. HTTP Cache-Control Extensions for Stale Content (stale-while-revalidate).<span class="url">rfc-editor.org/rfc/rfc5861</span></li>
+    <li>IETF HTTPAPI. The Idempotency-Key HTTP Header Field (rascunho).<span class="url">datatracker.ietf.org/doc/draft-ietf-httpapi-idempotency-key-header</span></li>
+    <li>IETF HTTPAPI. RateLimit header fields for HTTP (rascunho).<span class="url">datatracker.ietf.org/doc/draft-ietf-httpapi-ratelimit-headers</span></li>
+    <li>MDN Web Docs. AbortController e AbortSignal.timeout().<span class="url">developer.mozilla.org/docs/Web/API/AbortController</span></li>
+    <li>MDN Web Docs. Using server-sent events.<span class="url">developer.mozilla.org/docs/Web/API/Server-sent_events/Using_server-sent_events</span></li>
+    <li>MDN Web Docs. Navigator.onLine e os eventos online e offline.<span class="url">developer.mozilla.org/docs/Web/API/Navigator/onLine</span></li>
+    <li>MDN Web Docs. Intersection Observer API.<span class="url">developer.mozilla.org/docs/Web/API/Intersection_Observer_API</span></li>
+    <li>web.dev. Cumulative Layout Shift (CLS).<span class="url">web.dev/articles/cls</span></li>
+    <li>web.dev. Browser-level image lazy loading for the web.<span class="url">web.dev/articles/browser-level-image-lazy-loading</span></li>
+    <li>Marc Brooker. Exponential Backoff And Jitter. AWS Architecture Blog, 2015.<span class="url">aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter</span></li>
+    <li>AWS. Sharing objects with presigned URLs (Amazon S3).<span class="url">docs.aws.amazon.com/AmazonS3/latest/userguide/ShareObjectPreSignedURL.html</span></li>
+    <li>PostgreSQL. NOTIFY e LISTEN.<span class="url">postgresql.org/docs/current/sql-notify.html</span></li>
+    <li>TanStack Query. Documentação.<span class="url">tanstack.com/query</span></li>
+  </ol>
+</section>
+
+<script>
+/* Números de página do sumário: preenchidos por _ferramentas/paginar.py, a partir dos links do sumário */
+const PAGINAS = /*PAGINAS*/{"como-usar": 2, "nielsen": 4, "b1": 5, "t1": 6, "t2": 9, "t3": 12, "b2": 14, "t4": 15, "t5": 17, "t6": 19, "t7": 21, "t8": 24, "t9": 27, "t10": 29, "t11": 31, "b3": 34, "t12": 35, "t13": 37, "t14": 39, "t15": 42, "t16": 44, "t17": 46, "b4": 48, "t18": 49, "t19": 52, "t20": 54, "t21": 56, "t22": 58, "checklist": 61, "rodar": 63, "referencias": 65}/*FIM*/
+
+const C = { tinta: '#111', cinza: '#666', claro: '#d2d2d2', acento: '#b4321f', campo: '#888', pont: '#bbb', fundo: '#f1f2f4', foto: '#e9e9e9' }
+const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+const cor = (nome) => C[nome] || nome || C.tinta
+const svg = (w, h, corpo) => `<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">${corpo}</svg>`
+function txt(x, y, s, { tam = 10, c = C.tinta, peso = 400, ancora = 'start' } = {}) {
+  return `<text x="${x}" y="${y}" font-size="${tam}" fill="${c}" font-weight="${peso}" text-anchor="${ancora}">${esc(s)}</text>`
+}
+function ret(x, y, w, h, { fill = 'none', stroke = 'none', sw = 1, dash } = {}) {
+  return `<rect x="${x}" y="${y}" width="${Math.max(w, 0)}" height="${h}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"${dash ? ` stroke-dasharray="${dash}"` : ''}/>`
+}
+const linha = (x1, y1, x2, y2, c, sw = 1, dash) =>
+  `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c}" stroke-width="${sw}"${dash ? ` stroke-dasharray="${dash}"` : ''}/>`
+function coracao(cx, cy, cheio) {
+  const d = `M${cx} ${cy + 4.5} C${cx - 8} ${cy - 1} ${cx - 4.5} ${cy - 7.5} ${cx} ${cy - 3} C${cx + 4.5} ${cy - 7.5} ${cx + 8} ${cy - 1} ${cx} ${cy + 4.5} Z`
+  return `<path d="${d}" fill="${cheio ? C.tinta : 'none'}" stroke="${C.tinta}" stroke-width="1.1"/>`
+}
+
+/* ---------- Tela desenhada (ESTRUTURA.md, 5.1) ---------- */
+function item(it, x, y, iw) {
+  let s = '', h = 0
+  switch (it.t) {
+    case 'campo': {
+      let yy = y
+      if (it.rotulo) { s += txt(x, yy + 9, it.rotulo, { tam: 9.5, c: C.cinza }); yy += 13 }
+      s += ret(x, yy, iw, 24, { fill: '#fff', stroke: it.erro ? C.acento : C.campo, sw: it.erro ? 1 : 0.8 })
+      s += txt(x + 8, yy + 16, it.texto || it.dica || '', { tam: 11, c: it.texto ? C.tinta : '#999' })
+      yy += 24
+      if (it.erro) for (const l of [].concat(it.erro)) { s += txt(x, yy + 12, l, { tam: 9.5, c: C.acento }); yy += 13 }
+      if (it.erro) yy += 1
+      h = yy - y
+      break
+    }
+    case 'abas': {
+      let ax = x
+      s += linha(x, y + 23, x + iw, y + 23, C.claro, 1)
+      it.abas.forEach((nome, i) => {
+        const largura = nome.length * 5.6
+        const marcada = i === it.marcada
+        s += txt(ax, y + 16, nome, { tam: 10.5, c: marcada ? C.tinta : C.cinza, peso: marcada ? 500 : 400 })
+        if (marcada) s += linha(ax, y + 22, ax + largura, y + 22, C.tinta, 2)
+        ax += largura + 12
+      })
+      h = 24
+      break
+    }
+    case 'url':
+      s += ret(x, y, iw, 18, { fill: C.fundo }) + txt(x + 6, y + 12.5, it.texto, { tam: 9, c: C.cinza })
+      h = 18
+      break
+    case 'titulo':
+      s += txt(x, y + 11, it.texto, { tam: 11, c: cor(it.cor), peso: it.cor === 'acento' ? 600 : 500 })
+      h = 14
+      break
+    case 'texto': {
+      const linhas = [].concat(it.texto)
+      linhas.forEach((l, i) => (s += txt(x, y + 10 + i * 13, l, { tam: it.tam || 10, c: cor(it.cor || 'cinza') })))
+      h = 13 * linhas.length - 3
+      break
+    }
+    case 'linhas':
+      for (let i = 0; i < it.n; i++) s += ret(x, y + i * 18, iw, 12, { fill: C.claro })
+      h = 18 * it.n - 6
+      break
+    case 'botao': {
+      const bw = it.w || iw, bx = it.dir ? x + iw - bw : x
+      const estilo = {
+        normal: { stroke: C.tinta, c: C.tinta, fill: '#fff' },
+        desabilitado: { stroke: C.pont, c: '#999', fill: C.fundo },
+        acento: { stroke: C.acento, c: C.acento, fill: '#fff' },
+      }[it.estado || 'normal']
+      s += ret(bx, y, bw, 24, { fill: estilo.fill, stroke: estilo.stroke, sw: 1 })
+      s += txt(bx + bw / 2, y + 16, it.texto, { tam: 11, c: estilo.c, peso: 500, ancora: 'middle' })
+      h = 24
+      break
+    }
+    case 'aviso': {
+      const linhas = [].concat(it.texto)
+      const c = it.cor === 'acento' ? C.acento : C.tinta
+      h = 10 + 13 * linhas.length
+      s += ret(x, y, iw, h, { fill: '#fff', stroke: c, sw: 0.8 })
+      linhas.forEach((l, i) => (s += txt(x + 8, y + 15 + i * 13, l, { tam: 9.5, c, peso: i === 0 ? 500 : 400 })))
+      break
+    }
+    case 'spinner': {
+      const cx = x + iw / 2, cy = y + 20, r = 11
+      s += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${C.claro}" stroke-width="2.5"/>`
+      s += `<path d="M${cx} ${cy - r} A${r} ${r} 0 0 1 ${cx + r} ${cy}" fill="none" stroke="${C.tinta}" stroke-width="2.5"/>`
+      h = 40
+      break
+    }
+    case 'skel':
+      for (let i = 0; i < it.n; i++) {
+        const yy = y + i * 40
+        s += ret(x, yy, iw, 34, { stroke: C.claro })
+        s += ret(x + 8, yy + 8, iw * 0.55, 7, { fill: '#e3e3e3' }) + ret(x + 8, yy + 21, iw * 0.28, 7, { fill: '#e3e3e3' })
+      }
+      h = 40 * it.n - 6
+      break
+    case 'card':
+      it.cards.forEach((card, i) => {
+        const yy = y + i * 40
+        s += ret(x, yy, iw, 34, { stroke: C.claro })
+        s += txt(x + 8, yy + 14, card.nome, { tam: 10 }) + txt(x + 8, yy + 27, card.preco, { tam: 9.5, c: C.cinza })
+      })
+      h = 40 * it.cards.length - 6
+      break
+    case 'item':
+      s += txt(x, y + 12, it.texto, { tam: 10, c: cor(it.cor) })
+      if (it.coracao !== undefined) s += coracao(x + iw - 7, y + 8, it.coracao)
+      if (it.dir) s += txt(x + iw, y + 12, it.dir, { tam: 9.5, c: cor(it.dirCor || 'cinza'), ancora: 'end' })
+      s += linha(x, y + 19, x + iw, y + 19, C.claro, 0.8)
+      h = 20
+      break
+    case 'imagem':
+      s += ret(x, y, iw, it.h, { fill: C.foto })
+      h = it.h
+      break
+    case 'grade': {
+      const cols = it.cols || 3, g = 6, cw = (iw - g * (cols - 1)) / cols, ch = cw * 0.75
+      for (let i = 0; i < it.n; i++) {
+        const cx = x + (i % cols) * (cw + g), cy = y + Math.floor(i / cols) * (ch + g) + (it.dobra && Math.floor(i / cols) >= it.dobra ? 10 : 0)
+        s += i < it.cheias ? ret(cx, cy, cw, ch, { fill: C.foto }) : ret(cx, cy, cw, ch, { stroke: C.pont, sw: 0.8, dash: '3 2' })
+      }
+      const linhasGrade = Math.ceil(it.n / cols)
+      if (it.dobra) {
+        const yd = y + it.dobra * (ch + g) + 1
+        s += linha(x - 6, yd, x + iw + 6, yd, C.cinza, 0.8, '4 3')
+        s += txt(x + iw + 6, yd - 3, 'fim da tela', { tam: 8.5, c: C.cinza, ancora: 'end' })
+      }
+      h = linhasGrade * (ch + g) - g + (it.dobra ? 10 : 0)
+      break
+    }
+    case 'barra': {
+      s += txt(x, y + 9, it.rotulo, { tam: 9.5 })
+      s += ret(x, y + 14, iw, 8, { stroke: C.tinta, sw: 0.8 }) + ret(x, y + 14, iw * it.valor, 8, { fill: C.tinta })
+      if (it.legenda) s += txt(x, y + 34, it.legenda, { tam: 9, c: C.cinza })
+      h = it.legenda ? 36 : 22
+      break
+    }
+    case 'espaco':
+      h = it.h
+      break
+  }
+  return [s, h]
+}
+function itens(lista, x, y0, iw) {
+  let y = y0, s = ''
+  for (const it of lista) {
+    const [parte, h] = item(it, x, y, iw)
+    s += parte
+    y += h + (it.gap ?? 8)
+  }
+  return { s, h: y - y0 - 8 }
+}
+function sobre(o, w, h) {
+  switch (o.t) {
+    case 'cursor':
+      return `<path d="M${o.x} ${o.y} l0 16 l4 -4 l3 7 l2.6 -1.2 l-3 -7 l5.6 0 z" fill="#fff" stroke="${C.tinta}" stroke-width="1"/>`
+    case 'toast': {
+      const linhas = [].concat(o.texto), tw = Math.min(w - 24, 155), th = 10 + 13 * linhas.length
+      const tx = w - 12 - tw, ty = h - 12 - th
+      let s = ret(tx, ty, tw, th, { fill: '#fff', stroke: C.tinta, sw: 0.9 })
+      linhas.forEach((l, i) => (s += txt(tx + 8, ty + 15 + i * 13, l, { tam: 9, peso: i === 0 ? 500 : 400, c: i === 0 ? C.tinta : C.cinza })))
+      return s
+    }
+    case 'modal': {
+      const mx = 10, my = o.y ?? 36, mw = w - 20
+      const conteudo = itens(o.itens, mx + 10, my + 10, mw - 20)
+      return ret(0, 0, w, h, { fill: 'rgba(17,17,17,.10)' }) + ret(mx, my, mw, conteudo.h + 20, { fill: '#fff', stroke: C.tinta, sw: 1 }) + conteudo.s
+    }
+  }
+  return ''
+}
+function tela(spec) {
+  const n = spec.quadros.length, gap = 32, w = (598 - gap * (n - 1)) / n, h = spec.altura || 188
+  let s = ''
+  spec.quadros.forEach((q, i) => {
+    const x = 1 + i * (w + gap)
+    if (q.rotulo) s += txt(x + w / 2, 12, q.rotulo, { tam: 11, c: C.cinza, ancora: 'middle' })
+    let g = ret(0, 0, w, h, { stroke: q.erro ? C.acento : C.tinta, sw: q.erro ? 1.6 : 1 })
+    g += itens(q.itens || [], 12, 12, w - 24).s
+    for (const o of q.sobre || []) g += sobre(o, w, h)
+    s += `<g transform="translate(${x},24)">${g}</g>`
+  })
+  return svg(600, 24 + h + 2, s)
+}
+
+/* ---------- Linha do tempo (ESTRUTURA.md, 5.2) ---------- */
+function tempo(spec) {
+  const L = spec.L || 70, R = 574, max = spec.max, X = (t) => L + (t * (R - L)) / max
+  const passo = spec.passoLinha || 22, bh = 8
+  const fmt = (t) => (t === 0 ? '0' : t.toLocaleString('pt-BR') + ' s')
+  let y = 0, s = ''
+  const barra = (b, base) => {
+    const x1 = X(b.a), x2 = X(b.b ?? b.a)
+    let r = ''
+    switch (b.tipo || 'normal') {
+      case 'normal': r = ret(x1, base - bh, x2 - x1, bh, { fill: C.tinta }); break
+      case 'acento': r = ret(x1, base - bh, x2 - x1, bh, { fill: C.acento }); break
+      case 'cinza': r = ret(x1, base - bh, x2 - x1, bh, { fill: '#9a9a9a' }); break
+      case 'cancelada': r = linha(x1, base - 4, x2, base - 4, C.cinza, 1.5, '4 3'); break
+      case 'espera': r = ret(x1, base - bh, x2 - x1, bh, { stroke: C.cinza, sw: 1, dash: '3 2' }); break
+      case 'cache': r = ret(x1, base - bh, Math.max(x2 - x1, 3), bh, { fill: '#fff', stroke: C.tinta, sw: 1 }); break
+      case 'marco': r = linha(x1, base - 11, x1, base + 2, C.tinta, 1.5); break
+    }
+    if (b.txt) {
+      const tx = (b.tipo === 'marco' ? x1 + 5 : Math.max(x2, x1 + 3) + 6)
+      r += txt(tx, base, b.txt, { tam: 10, c: cor(b.txtCor || (b.tipo === 'acento' ? 'acento' : 'cinza')) })
+    }
+    return r
+  }
+  for (const p of spec.paineis) {
+    if (p.titulo) { s += txt(0, y + 12, p.titulo, { tam: 11.5, peso: 600 }); y += 28 } else y += 6
+    for (const l of p.linhas) {
+      const base = y + 12
+      s += txt(0, base, l.r, { tam: 10.5, c: cor(l.rcor) })
+      for (const b of l.barras || [l]) s += barra(b, base)
+      y += passo
+    }
+    if (p.tela) {
+      y += 6
+      s += txt(0, y + 13, 'na tela', { tam: 10.5, c: C.cinza })
+      if (p.tela[0].a > 0) s += linha(L, y + 9, X(p.tela[0].a), y + 9, C.pont, 1, '2 3')
+      for (const t of p.tela) {
+        const x1 = X(t.a), x2 = X(t.b), meio = (x1 + x2) / 2
+        if (t.tipo === 'acento') s += ret(x1, y, x2 - x1, 18, { fill: C.acento }) + txt(meio, y + 12.5, t.txt, { tam: 10, c: '#fff', ancora: 'middle' })
+        else if (t.tipo === 'espera') s += ret(x1, y, x2 - x1, 18, { stroke: C.pont, sw: 0.9, dash: '3 2' }) + txt(meio, y + 12.5, t.txt, { tam: 9.5, c: C.cinza, ancora: 'middle' })
+        else if (t.tipo === 'espera-acento') s += ret(x1, y, x2 - x1, 18, { stroke: C.acento, sw: 1.2, dash: '3 2' }) + txt(meio, y + 12.5, t.txt, { tam: 9.5, c: C.acento, ancora: 'middle' })
+        else s += ret(x1, y, x2 - x1, 18, { stroke: C.tinta, sw: 0.9 }) + txt(meio, y + 12.5, t.txt, { tam: 10, ancora: 'middle' })
+      }
+      y += 18
+    }
+    y += 22
+  }
+  y -= 22
+  const ya = y + 14
+  s += linha(L, ya, R, ya, C.tinta, 0.8)
+  for (const t of spec.marcas) s += linha(X(t), ya, X(t), ya + 4, C.tinta, 0.8) + txt(X(t), ya + 17, fmt(t), { tam: 10, c: C.cinza, ancora: 'middle' })
+  return svg(600, ya + 20, s)
+}
+
+/* ---------- Figura dos limites de Nielsen ---------- */
+function nielsen() {
+  const X = (t) => 10 + ((Math.log10(t) + 1.6) / 3.3) * 580
+  let s = ''
+  const faixas = [
+    [0.025, 0.1, 'Parece instantâneo', 'Temas 9 e 14'],
+    [0.1, 1, 'Percebe, mas não se distrai', 'Temas 5, 6 e 18'],
+    [1, 10, 'Precisa ver que algo acontece', 'Temas 4, 5 e 11'],
+    [10, 50, 'Vai fazer outra coisa', 'Temas 11 e 12'],
+  ]
+  for (const [a, b, rotulo, temas] of faixas) {
+    const meio = (X(a) + X(b)) / 2
+    s += txt(meio, 58, rotulo, { tam: 10.5, ancora: 'middle' }) + txt(meio, 76, temas, { tam: 10, c: C.cinza, ancora: 'middle' })
+  }
+  s += linha(10, 92, 590, 92, C.tinta, 0.8)
+  for (const [t, rotulo] of [[0.1, '0,1 s'], [1, '1 s'], [10, '10 s']]) {
+    s += linha(X(t), 26, X(t), 96, C.tinta, 1) + txt(X(t), 18, rotulo, { tam: 13, peso: 600, ancora: 'middle' })
+  }
+  return svg(600, 100, s)
+}
+
+/* ---------- As figuras de cada tema ---------- */
+const ABAS = ['Eletrônicos', 'Livros', 'Casa']
+const FIGURAS = {
+  nielsen: () => nielsen(),
+
+  t1: () => tela({ altura: 214, quadros: [
+    { rotulo: 'Só no servidor', erro: true, itens: [
+      { t: 'aviso', texto: ['Algo deu errado.', 'Tente novamente.'], cor: 'acento' },
+      { t: 'campo', dica: 'Nome' }, { t: 'campo', dica: 'Categoria' }, { t: 'campo', dica: 'Preço' },
+      { t: 'botao', texto: 'Cadastrar' } ] },
+    { rotulo: 'Botão sempre habilitado', itens: [
+      { t: 'aviso', texto: 'Falta preencher: Categoria, Preço', cor: 'acento' },
+      { t: 'campo', texto: 'Garrafa de vidro' },
+      { t: 'campo', dica: 'Categoria', erro: 'Escolha uma categoria' },
+      { t: 'campo', dica: 'Preço', erro: ['Informe um preço maior', 'que zero'] },
+      { t: 'botao', texto: 'Cadastrar' } ] },
+    { rotulo: 'Erro ao sair do campo', itens: [
+      { t: 'campo', texto: 'Garrafa de vidro' },
+      { t: 'campo', dica: 'Categoria', erro: 'Escolha uma categoria' },
+      { t: 'campo', dica: 'Preço' },
+      { t: 'botao', texto: 'Cadastrar', estado: 'desabilitado' } ] },
+  ] }),
+
+  t2: () => tela({ quadros: [
+    { rotulo: 'Erro genérico (500)', erro: true, itens: [
+      { t: 'aviso', texto: 'Algo deu errado.', cor: 'acento' },
+      { t: 'campo', texto: 'Teclado mecânico' }, { t: 'campo', texto: 'Eletrônicos' }, { t: 'campo', texto: 'R$ 299,00' },
+      { t: 'botao', texto: 'Cadastrar' } ] },
+    { rotulo: '409 com code PRODUCT_NAME_TAKEN', itens: [
+      { t: 'campo', texto: 'Teclado mecânico', erro: ['Já existe um produto com esse nome.', 'Que tal um nome diferente?'] },
+      { t: 'campo', texto: 'Eletrônicos' }, { t: 'campo', texto: 'R$ 299,00' },
+      { t: 'botao', texto: 'Cadastrar' } ] },
+  ] }),
+
+  t3: () => tela({ quadros: [
+    { rotulo: 'Filtrou', itens: [
+      { t: 'url', texto: '/url-como-estado' }, { t: 'campo', texto: 'garrafa' },
+      { t: 'abas', abas: ABAS, marcada: 2 }, { t: 'linhas', n: 1 } ] },
+    { rotulo: 'Depois do F5, só na memória', erro: true, itens: [
+      { t: 'url', texto: '/url-como-estado' }, { t: 'campo', dica: 'Buscar' },
+      { t: 'abas', abas: ABAS, marcada: 0 }, { t: 'linhas', n: 5 } ] },
+    { rotulo: 'Depois do F5, na URL', itens: [
+      { t: 'url', texto: '?busca=garrafa&categoria=Casa' }, { t: 'campo', texto: 'garrafa' },
+      { t: 'abas', abas: ABAS, marcada: 2 }, { t: 'linhas', n: 1 } ] },
+  ] }),
+
+  t4: () => tela({ quadros: [
+    { rotulo: 'Carregando', itens: [ { t: 'campo', texto: 'fone' }, { t: 'espaco', h: 30 }, { t: 'spinner' } ] },
+    { rotulo: 'Erro', itens: [
+      { t: 'campo', texto: 'fone' },
+      { t: 'aviso', texto: ['Não foi possível carregar', 'os produtos'] },
+      { t: 'texto', texto: ['Pode ser a conexão ou o', 'servidor. Sua busca', 'continua aqui.'] },
+      { t: 'botao', texto: 'Tentar de novo' } ] },
+    { rotulo: 'Vazio', itens: [
+      { t: 'campo', texto: 'xyz' },
+      { t: 'titulo', texto: 'Nenhum produto encontrado', gap: 2 },
+      { t: 'titulo', texto: 'para “xyz”' },
+      { t: 'texto', texto: ['Confira a grafia ou tente', 'uma palavra mais curta,', 'como “fone”.'] },
+      { t: 'botao', texto: 'Ver todos os produtos' } ] },
+  ] }),
+
+  t5: () => tela({ quadros: [
+    { rotulo: 'Spinner, 0,5 s', erro: true, itens: [ { t: 'abas', abas: ABAS, marcada: 1 }, { t: 'espaco', h: 40 }, { t: 'spinner' } ] },
+    { rotulo: 'Skeleton, 0,5 s', itens: [ { t: 'abas', abas: ABAS, marcada: 1 }, { t: 'skel', n: 3 } ] },
+    { rotulo: 'Os dados chegaram, 1 s', itens: [ { t: 'abas', abas: ABAS, marcada: 1 }, { t: 'card', cards: [
+      { nome: 'Arquitetura limpa', preco: 'R$ 99,90' }, { nome: 'Código limpo', preco: 'R$ 94,90' },
+      { nome: 'Design de coisas do dia a dia', preco: 'R$ 79,90' } ] } ] },
+  ] }),
+
+  t6: () => tela({ quadros: [
+    { rotulo: '0,5 s', itens: [
+      { t: 'texto', texto: 'Caixa de som Bluetooth', cor: 'tinta' }, { t: 'texto', texto: 'R$ 249,90' }, { t: 'botao', texto: 'Comprar' },
+      { t: 'texto', texto: 'Fone de ouvido com fio', cor: 'tinta' }, { t: 'texto', texto: 'R$ 49,90' }, { t: 'botao', texto: 'Comprar' } ],
+      sobre: [ { t: 'cursor', x: 112, y: 56 } ] },
+    { rotulo: '0,6 s: a foto chegou', erro: true, itens: [
+      { t: 'imagem', h: 70 },
+      { t: 'texto', texto: 'Caixa de som Bluetooth', cor: 'tinta' }, { t: 'texto', texto: 'R$ 249,90' }, { t: 'botao', texto: 'Comprar' } ],
+      sobre: [ { t: 'cursor', x: 112, y: 56 } ] },
+    { rotulo: 'Com espaço reservado', itens: [
+      { t: 'imagem', h: 70 },
+      { t: 'texto', texto: 'Caixa de som Bluetooth', cor: 'tinta' }, { t: 'texto', texto: 'R$ 249,90' }, { t: 'botao', texto: 'Comprar' } ],
+      sobre: [ { t: 'cursor', x: 112, y: 132 } ] },
+  ] }),
+
+  t7: () => tempo({ max: 1.4, marcas: [0, 0.25, 0.5, 0.75, 1, 1.25], paineis: [
+    { titulo: 'Sem debounce', linhas: [
+      { r: '“f”', a: 0, b: 0.3 }, { r: '“fo”', a: 0.15, b: 0.45 }, { r: '“fon”', a: 0.3, b: 0.6 }, { r: '“fone”', a: 0.45, b: 0.75 } ],
+      tela: [ { a: 0.3, b: 0.45, txt: 'f' }, { a: 0.45, b: 0.6, txt: 'fo' }, { a: 0.6, b: 0.75, txt: 'fon' }, { a: 0.75, b: 1.4, txt: 'fone' } ] },
+    { titulo: 'Com debounce de 400 ms', linhas: [
+      { r: 'teclas', barras: [ { tipo: 'marco', a: 0 }, { tipo: 'marco', a: 0.15 }, { tipo: 'marco', a: 0.3 }, { tipo: 'marco', a: 0.45 },
+        { tipo: 'espera', a: 0.45, b: 0.85, txt: '400 ms sem digitar' } ] },
+      { r: '“fone”', a: 0.85, b: 1.15 } ],
+      tela: [ { a: 1.15, b: 1.4, txt: 'fone' } ] },
+  ] }),
+
+  t8a: () => tela({ quadros: [
+    { rotulo: '0,0 s', itens: [ { t: 'abas', abas: ABAS, marcada: 0 }, { t: 'titulo', texto: 'Carregando…', cor: 'cinza' } ] },
+    { rotulo: '0,4 s', itens: [ { t: 'abas', abas: ABAS, marcada: 2 }, { t: 'titulo', texto: 'Produtos de Casa' }, { t: 'linhas', n: 4 } ] },
+    { rotulo: '2,0 s', erro: true, itens: [ { t: 'abas', abas: ABAS, marcada: 2 }, { t: 'titulo', texto: 'Produtos de Eletrônicos', cor: 'acento' }, { t: 'linhas', n: 6 } ] },
+  ] }),
+
+  t8b: () => tempo({ max: 2.4, marcas: [0, 0.5, 1, 1.5, 2], paineis: [
+    { titulo: 'Sem cancelamento', linhas: [
+      { r: 'Eletrônicos', a: 0, b: 2, tipo: 'acento', txt: '2ª, a última' },
+      { r: 'Casa', a: 0.1, b: 0.4, txt: '1ª' } ],
+      tela: [ { a: 0.4, b: 2, txt: 'Casa' }, { a: 2, b: 2.4, txt: 'Eletrônicos', tipo: 'acento' } ] },
+    { titulo: 'Com AbortController', linhas: [
+      { r: 'Eletrônicos', rcor: 'cinza', a: 0, b: 0.1, tipo: 'cancelada', txt: 'cancelada no clique em Casa' },
+      { r: 'Casa', a: 0.1, b: 0.4, txt: 'chegou', txtCor: 'tinta' } ],
+      tela: [ { a: 0.4, b: 2.4, txt: 'Casa' } ] },
+  ] }),
+
+  t9: () => tela({ quadros: [
+    { rotulo: 'Espera a API: 0,5 s depois', erro: true, itens: [
+      { t: 'item', texto: 'Caixa de som Bluetooth', coracao: false }, { t: 'item', texto: 'Carregador portátil', coracao: false },
+      { t: 'item', texto: 'Fone de ouvido Bluetooth', coracao: true } ],
+      sobre: [ { t: 'cursor', x: 158, y: 22 } ] },
+    { rotulo: 'Muda na hora: 0,0 s', itens: [
+      { t: 'item', texto: 'Caixa de som Bluetooth', coracao: true }, { t: 'item', texto: 'Carregador portátil', coracao: false },
+      { t: 'item', texto: 'Fone de ouvido Bluetooth', coracao: true } ],
+      sobre: [ { t: 'cursor', x: 158, y: 22 } ] },
+    { rotulo: 'A API recusou: volta e avisa', itens: [
+      { t: 'aviso', texto: ['Não foi possível favoritar', '“Caixa de som Bluetooth”.'] },
+      { t: 'item', texto: 'Caixa de som Bluetooth', coracao: false }, { t: 'item', texto: 'Carregador portátil', coracao: false },
+      { t: 'item', texto: 'Fone de ouvido Bluetooth', coracao: true } ] },
+  ] }),
+
+  t10: () => {
+    const vitrine = [
+      { t: 'card', cards: [ { nome: 'Bicicleta urbana', preco: 'R$ 1.899,00' } ] }, { t: 'botao', texto: 'Adicionar ao carrinho' },
+      { t: 'card', cards: [ { nome: 'Capacete de bicicleta', preco: 'R$ 179,90' } ] } ]
+    return tela({ quadros: [
+      { rotulo: 'Nada acontece', itens: vitrine, sobre: [ { t: 'cursor', x: 128, y: 60 } ] },
+      { rotulo: 'Alerta que bloqueia', itens: vitrine, sobre: [ { t: 'modal', y: 50, itens: [
+        { t: 'titulo', texto: 'Sucesso!' },
+        { t: 'texto', texto: ['“Bicicleta urbana” foi', 'adicionado ao carrinho', 'com sucesso.'], cor: 'tinta', tam: 9.5 },
+        { t: 'botao', texto: 'OK' } ] } ] },
+      { rotulo: 'Toast', itens: vitrine, sobre: [ { t: 'toast', texto: ['Adicionado ao carrinho', 'Bicicleta urbana · 1 item', 'no carrinho'] } ] },
+    ] })
+  },
+
+  t11a: () => tela({ quadros: [
+    { rotulo: 'Sem progresso', erro: true, itens: [
+      { t: 'texto', texto: 'foto.jpg · 10 MB', cor: 'tinta' }, { t: 'espaco', h: 16 },
+      { t: 'aviso', texto: ['Arquivo recebido.', 'Estamos processando.'] } ] },
+    { rotulo: 'Fase 1: envio', itens: [
+      { t: 'texto', texto: 'foto.jpg · 10 MB', cor: 'tinta' },
+      { t: 'barra', rotulo: '1. Envio do arquivo', valor: 0.6, legenda: '60%' } ] },
+    { rotulo: 'Fase 2: processamento', itens: [
+      { t: 'texto', texto: 'foto.jpg · 10 MB', cor: 'tinta' },
+      { t: 'barra', rotulo: '1. Envio do arquivo', valor: 1, legenda: '100%' },
+      { t: 'barra', rotulo: '2. Processamento no servidor', valor: 0.5, legenda: 'Gerando miniaturas · 50%' } ] },
+  ] }),
+
+  t11b: () => {
+    const telaBoa = [ { a: 0, b: 1, txt: '0%' }, { a: 1, b: 2.6, txt: '25%' }, { a: 2.6, b: 3.4, txt: '50%' }, { a: 3.4, b: 5, txt: '75%' }, { a: 5, b: 6.6, txt: '100%' } ]
+    return tempo({ L: 90, max: 6.6, marcas: [0, 1, 2, 3, 4, 5, 6], paineis: [
+      { titulo: 'No servidor', linhas: [ { r: 'novidades', barras: [
+        { tipo: 'marco', a: 1, txt: '25%', txtCor: 'tinta' }, { tipo: 'marco', a: 2.6, txt: '50%', txtCor: 'tinta' },
+        { tipo: 'marco', a: 3.4, txt: '75%', txtCor: 'tinta' }, { tipo: 'marco', a: 5, txt: '100%', txtCor: 'tinta' } ] } ] },
+      { titulo: 'Short polling, a cada 2 s', linhas: [ { r: 'perguntas', barras: [
+        { a: 0, b: 0.12 }, { a: 2, b: 2.12 }, { a: 4, b: 4.12 }, { a: 6, b: 6.12 } ] } ],
+        tela: [ { a: 0.12, b: 2.12, txt: '0%' }, { a: 2.12, b: 4.12, txt: '25%' }, { a: 4.12, b: 6.12, txt: '75%' }, { a: 6.12, b: 6.6, txt: '100%' } ] },
+      { titulo: 'Long polling', linhas: [ { r: 'pergunta', barras: [ { a: 0, b: 5, txt: 'uma pergunta, a API segura' } ] } ],
+        tela: [ { a: 0, b: 5, txt: 'Esperando o servidor avisar que terminou…' }, { a: 5, b: 6.6, txt: '100%' } ] },
+      { titulo: 'SSE', linhas: [ { r: 'conexão', barras: [ { a: 0, b: 5, txt: 'uma conexão, quatro avisos' } ] } ], tela: telaBoa },
+    ] })
+  },
+
+  t12: () => tela({ quadros: [
+    { rotulo: '0 s', itens: [ { t: 'titulo', texto: 'Produtos' }, { t: 'espaco', h: 40 }, { t: 'spinner' } ] },
+    { rotulo: '25 s, espera para sempre', erro: true, itens: [ { t: 'titulo', texto: 'Produtos' }, { t: 'espaco', h: 40 }, { t: 'spinner' } ] },
+    { rotulo: '5 s, com timeout', itens: [
+      { t: 'titulo', texto: 'Produtos' },
+      { t: 'aviso', texto: ['O servidor está demorando', 'mais que o normal.'] },
+      { t: 'texto', texto: ['Pode ser instabilidade. Tente', 'de novo em alguns instantes.'] },
+      { t: 'botao', texto: 'Tentar de novo' } ] },
+  ] }),
+
+  t13: () => tempo({ L: 80, max: 4.6, marcas: [0, 1, 2, 3, 4], paineis: [
+    { titulo: 'Retry sem parar', linhas: [ { r: 'tentativas', barras: [
+      ...Array.from({ length: 14 }, (_, k) => ({ a: k * 0.3, b: k * 0.3 + 0.22, tipo: 'acento' })),
+      { tipo: 'marco', a: 4.18, txt: 'para sempre', txtCor: 'acento' } ] } ] },
+    { titulo: 'Exponential backoff', linhas: [
+      { r: '1ª', a: 0, b: 0.3, tipo: 'cinza', txt: '503' },
+      { r: '2ª', barras: [ { a: 0.3, b: 1.3, tipo: 'espera' }, { a: 1.3, b: 1.6, tipo: 'cinza', txt: '503' } ] },
+      { r: '3ª', barras: [ { a: 1.6, b: 3.6, tipo: 'espera' }, { a: 3.6, b: 3.9, txt: '200', txtCor: 'tinta' } ] } ],
+      tela: [ { a: 0, b: 3.9, txt: 'Carregando…', tipo: 'espera' }, { a: 3.9, b: 4.6, txt: 'lista' } ] },
+  ] }),
+
+  t14: () => {
+    const pix = [ { t: 'campo', texto: 'Maria Silva' }, { t: 'campo', texto: 'R$ 50,00' } ]
+    return tela({ altura: 210, quadros: [
+      { rotulo: 'Sem proteção', erro: true, itens: [ ...pix, { t: 'botao', texto: 'Transferir' }, { t: 'titulo', texto: 'Pix no banco: 3' },
+        { t: 'item', texto: 'Pix #43 · R$ 50,00', cor: 'acento', gap: 4 }, { t: 'item', texto: 'Pix #42 · R$ 50,00', cor: 'acento', gap: 4 }, { t: 'item', texto: 'Pix #41 · R$ 50,00' } ],
+        sobre: [ { t: 'cursor', x: 130, y: 82 } ] },
+      { rotulo: 'Botão travado', itens: [ ...pix, { t: 'botao', texto: 'Enviando…', estado: 'desabilitado' }, { t: 'titulo', texto: 'Pix no banco: 1' },
+        { t: 'item', texto: 'Pix #41 · R$ 50,00' } ] },
+      { rotulo: 'Chave de idempotência', itens: [ ...pix, { t: 'botao', texto: 'Transferir' }, { t: 'texto', texto: 'Chave: 3f9a1c2e' },
+        { t: 'titulo', texto: 'Pix no banco: 1' }, { t: 'item', texto: 'Pix #41 · R$ 50,00' } ] },
+    ] })
+  },
+
+  t15: () => tela({ quadros: [
+    { rotulo: '429 sem explicação', erro: true, itens: [
+      { t: 'campo', rotulo: 'Cupom de desconto', texto: 'BEMVINDO01' }, { t: 'botao', texto: 'Aplicar', w: 90 },
+      { t: 'aviso', texto: 'Algo deu errado.', cor: 'acento' } ] },
+    { rotulo: 'Com Retry-After', itens: [
+      { t: 'campo', rotulo: 'Cupom de desconto', texto: 'BEMVINDO01' }, { t: 'botao', texto: 'Aguarde 7s', w: 90, estado: 'desabilitado' },
+      { t: 'aviso', texto: ['Muitas tentativas seguidas. Tente novamente', 'em 7 segundos.'] } ] },
+  ] }),
+
+  t16: () => {
+    const preenchido = [ { t: 'campo', texto: 'Ana Souza' }, { t: 'campo', texto: 'ana@email.com' }, { t: 'campo', texto: '(11) 98765-4321' },
+      { t: 'campo', texto: 'Rua das Flores, 120' }, { t: 'botao', texto: 'Salvar cadastro' } ]
+    return tela({ altura: 200, quadros: [
+      { rotulo: 'Formulário preenchido', itens: preenchido, sobre: [ { t: 'cursor', x: 130, y: 150 } ] },
+      { rotulo: 'Perde o formulário', erro: true, itens: [
+        { t: 'titulo', texto: 'Entre para continuar' }, { t: 'campo', dica: 'E-mail' }, { t: 'campo', dica: 'Senha' }, { t: 'botao', texto: 'Entrar' },
+        { t: 'espaco', h: 6 }, { t: 'texto', texto: ['Depois do login, o', 'formulário volta vazio.'], cor: 'acento' } ] },
+      { rotulo: 'Modal de login', itens: preenchido, sobre: [ { t: 'modal', y: 30, itens: [
+        { t: 'texto', texto: ['Sua sessão expirou. Entre', 'de novo para continuar.'], cor: 'tinta', tam: 9.5 },
+        { t: 'campo', dica: 'E-mail' }, { t: 'campo', dica: 'Senha' }, { t: 'botao', texto: 'Entrar' } ] } ] },
+    ] })
+  },
+
+  t17: () => tela({ quadros: [
+    { rotulo: 'Perde a ação', erro: true, itens: [
+      { t: 'aviso', texto: 'Algo deu errado.', cor: 'acento' },
+      { t: 'item', texto: 'Arquitetura limpa', coracao: false }, { t: 'item', texto: 'Código limpo', coracao: false },
+      { t: 'item', texto: 'Entendendo algoritmos', coracao: false } ] },
+    { rotulo: 'Sem conexão', itens: [
+      { t: 'aviso', texto: ['Você está sem conexão', 'Pode continuar: o que você', 'fizer será enviado quando', 'a conexão voltar.'] },
+      { t: 'item', texto: 'Arquitetura limpa', coracao: true }, { t: 'item', texto: 'Código limpo', coracao: true },
+      { t: 'item', texto: 'Entendendo algoritmos', coracao: false },
+      { t: 'texto', texto: '2 ações esperando para enviar' } ] },
+    { rotulo: 'A conexão voltou', itens: [
+      { t: 'item', texto: 'Arquitetura limpa', coracao: true }, { t: 'item', texto: 'Código limpo', coracao: true },
+      { t: 'item', texto: 'Entendendo algoritmos', coracao: false } ] },
+  ] }),
+
+  t18: () => tempo({ L: 120, max: 5.6, marcas: [0, 1, 2, 3, 4, 5], paineis: [
+    { titulo: 'Sem cache', linhas: [
+      { r: 'Eletrônicos', a: 0, b: 1 }, { r: 'Livros', a: 2, b: 3 },
+      { r: 'Eletrônicos de novo', a: 4, b: 5, tipo: 'acento', txt: 'tudo de novo' } ],
+      tela: [ { a: 0, b: 1, txt: 'carregando', tipo: 'espera' }, { a: 1, b: 2, txt: 'Eletrônicos' }, { a: 2, b: 3, txt: 'carregando', tipo: 'espera' },
+        { a: 3, b: 4, txt: 'Livros' }, { a: 4, b: 5, txt: 'carregando', tipo: 'espera-acento' }, { a: 5, b: 5.6, txt: 'Eletr.' } ] },
+    { titulo: 'Com cache', linhas: [
+      { r: 'Eletrônicos', a: 0, b: 1 }, { r: 'Livros', a: 2, b: 3 },
+      { r: 'Eletrônicos de novo', barras: [ { a: 4, b: 4.04, tipo: 'cache' }, { a: 4.1, b: 5, txt: 'por trás' } ] } ],
+      tela: [ { a: 0, b: 1, txt: 'carregando', tipo: 'espera' }, { a: 1, b: 2, txt: 'Eletrônicos' }, { a: 2, b: 3, txt: 'carregando', tipo: 'espera' },
+        { a: 3, b: 4, txt: 'Livros' }, { a: 4, b: 5.6, txt: 'Eletrônicos' } ] },
+  ] }),
+
+  t19: () => tempo({ L: 90, max: 2, marcas: [0, 0.5, 1, 1.5], paineis: [
+    { titulo: 'URL nova a cada vez', linhas: [
+      { r: '1º acesso', a: 0, b: 1.2, txt: '12 fotos baixadas' },
+      { r: 'F5', a: 0, b: 1.2, tipo: 'acento', txt: '12 fotos baixadas de novo' },
+      { r: 'F5', a: 0, b: 1.2, tipo: 'acento', txt: '12 fotos baixadas de novo' } ] },
+    { titulo: 'URL reaproveitada', linhas: [
+      { r: '1º acesso', a: 0, b: 1.2, txt: '12 fotos baixadas' },
+      { r: 'F5', a: 0, b: 0.03, tipo: 'cache', txt: '12 fotos do cache', txtCor: 'tinta' },
+      { r: 'F5', a: 0, b: 0.03, tipo: 'cache', txt: '12 fotos do cache', txtCor: 'tinta' } ] },
+  ] }),
+
+  t20: () => tela({ quadros: [
+    { rotulo: 'Tudo de uma vez', erro: true, itens: [
+      { t: 'texto', texto: 'Imagens baixadas: 200', cor: 'acento' },
+      { t: 'grade', cols: 4, n: 12, cheias: 12, dobra: 2 } ] },
+    { rotulo: 'loading="lazy"', itens: [
+      { t: 'texto', texto: 'Só as que estão perto da tela', cor: 'tinta' },
+      { t: 'grade', cols: 4, n: 12, cheias: 8, dobra: 2 } ] },
+  ] }),
+
+  t21: () => tempo({ L: 178, max: 1.8, marcas: [0, 0.25, 0.5, 0.75, 1, 1.25, 1.5], paineis: [
+    { titulo: 'Um endpoint por recurso: 15 requisições', linhas: [
+      { r: 'GET /produtos/7', a: 0, b: 0.3 },
+      { r: 'GET /vendedores/3', a: 0.3, b: 0.6 },
+      { r: 'GET /produtos/7/comentarios', a: 0.3, b: 0.6 },
+      { r: 'GET /comentarios/:id × 4', a: 0.6, b: 0.9, tipo: 'acento' },
+      { r: 'GET /comentarios/:id × 4', a: 0.9, b: 1.2, tipo: 'acento', txt: 'segunda leva' },
+      { r: 'GET /comentarios/:id × 4', a: 1.2, b: 1.5, tipo: 'acento', txt: 'terceira leva' } ],
+      tela: [ { a: 0, b: 1.5, txt: 'carregando', tipo: 'espera' }, { a: 1.5, b: 1.8, txt: 'pronta' } ] },
+    { titulo: 'Um endpoint por tela: 1 requisição', linhas: [ { r: 'GET /telas/produto/7', a: 0, b: 0.35 } ],
+      tela: [ { a: 0, b: 0.35, txt: '', tipo: 'espera' }, { a: 0.35, b: 1.8, txt: 'pronta' } ] },
+  ] }),
+
+  t22: () => tela({ quadros: [
+    { rotulo: 'Página 1', itens: [
+      { t: 'item', texto: 'Publicação 5000', gap: 4 }, { t: 'item', texto: 'Publicação 4999', gap: 4 }, { t: 'item', texto: 'Publicação 4998', gap: 4 },
+      { t: 'texto', texto: '…', gap: 4 }, { t: 'item', texto: 'Publicação 4992', gap: 4 }, { t: 'item', texto: 'Publicação 4991', gap: 4 } ] },
+    { rotulo: 'Página 2, com offset', erro: true, itens: [
+      { t: 'item', texto: 'Publicação 4991', cor: 'acento', dir: 'repetida', dirCor: 'acento', gap: 4 },
+      { t: 'item', texto: 'Publicação 4990', gap: 4 }, { t: 'item', texto: 'Publicação 4989', gap: 4 }, { t: 'item', texto: 'Publicação 4988', gap: 4 },
+      { t: 'texto', texto: '…', gap: 4 } ] },
+    { rotulo: 'Página 2, com cursor', itens: [
+      { t: 'item', texto: 'Publicação 4990', gap: 4 }, { t: 'item', texto: 'Publicação 4989', gap: 4 }, { t: 'item', texto: 'Publicação 4988', gap: 4 },
+      { t: 'item', texto: 'Publicação 4987', gap: 4 }, { t: 'texto', texto: '…', gap: 4 } ] },
+  ] }),
+}
+
+/* ---------- Monta a apostila ---------- */
+for (const alvo of document.querySelectorAll('[data-fig]')) {
+  const gerar = FIGURAS[alvo.dataset.fig]
+  alvo.innerHTML = gerar ? gerar() : `<p style="color:red">Figura ${alvo.dataset.fig} não encontrada</p>`
+}
+
+const temas = [...document.querySelectorAll('section.tema')]
+
+// Sumário e aberturas de bloco
+for (const ol of document.querySelectorAll('.sumario ol[data-bloco]')) {
+  const d = document.querySelector(`section.divisor[data-bloco="${ol.dataset.bloco}"]`)
+  ol.insertAdjacentHTML('beforeend', `<li class="cap"><a href="#${d.id}"><span class="rot">Bloco ${ol.dataset.bloco}</span><span>${d.querySelector('h1').textContent}</span><span class="vazio"></span><span class="pag" data-alvo="${d.id}"></span></a></li>`)
+  for (const t of temas.filter((t) => t.dataset.bloco === ol.dataset.bloco)) {
+    ol.insertAdjacentHTML('beforeend', `<li class="sec"><a href="#${t.id}"><span class="n">${t.dataset.tema}</span><span>${t.dataset.nome}</span><span class="pontos"></span><span class="pag" data-alvo="${t.id}"></span></a></li>`)
+  }
+}
+for (const d of document.querySelectorAll('section.divisor')) {
+  const ol = d.querySelector('ol')
+  for (const t of temas.filter((t) => t.dataset.bloco === d.dataset.bloco)) {
+    ol.insertAdjacentHTML('beforeend', `<li><span>${t.dataset.tema}</span><span>${t.dataset.nome}</span><span>${t.dataset.etiqueta}</span></li>`)
+  }
+}
+for (const p of document.querySelectorAll('.pag[data-alvo]')) p.textContent = PAGINAS[p.dataset.alvo] ?? ''
+
+// Cabeçalho de cada seção: uma página nomeada por seção
+let regras = ''
+document.querySelectorAll('section[data-cab]').forEach((s, i) => {
+  s.style.page = 'p' + i
+  regras += `@page p${i} { @top-right { content: "${s.dataset.cab}"; font: 8.5pt "Fira Sans", sans-serif; color: #666; } }\n`
+})
+document.head.insertAdjacentHTML('beforeend', `<style>${regras}</style>`)
+
+hljs.highlightAll()
+</script>
+</body>
+</html>
